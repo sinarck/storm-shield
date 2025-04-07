@@ -2,6 +2,7 @@ import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../constants/Colors";
+import { useHaptics } from "../hooks/useHaptics";
 
 interface OrganizationCardProps {
   title: string;
@@ -21,9 +22,16 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({
   rating,
   onPress,
 }) => {
+  const triggerHaptic = useHaptics("light");
+
+  const handlePress = async () => {
+    await triggerHaptic();
+    onPress?.();
+  };
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       style={({ pressed }) => [styles.container, pressed && styles.pressed]}
       android_ripple={{ color: "rgba(255,255,255,0.1)" }}
     >

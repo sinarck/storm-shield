@@ -1,19 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React from "react";
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { getShiftById } from "../../config/mockData";
 import { Colors } from "../../constants/Colors";
+import { useHaptics } from "../../hooks/useHaptics";
 
 export default function ShiftDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const triggerHaptic = useHaptics("medium");
+  const triggerSuccess = useHaptics("success");
 
   // Get shift data from mock data
   const shiftData = getShiftById(id || "1");
@@ -21,7 +17,8 @@ export default function ShiftDetails() {
   /**
    * Navigate to confirmation page with no back button
    */
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
+    await triggerSuccess();
     router.navigate({
       pathname: "/confirmation/[id]",
       params: { id: shiftData.id },
@@ -44,29 +41,29 @@ export default function ShiftDetails() {
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
-            <Image
-              source={{ uri: shiftData.imageUrl }}
-              style={styles.image}
-              resizeMode="cover"
-            />
-            <View style={styles.headerOverlay} />
-          </View>
-
           <View style={styles.content}>
-            <Text style={styles.title}>{shiftData.title}</Text>
-            <View style={styles.dateTimeContainer}>
-              <Text style={styles.dateTime}>
-                {shiftData.date} | {shiftData.time}
-              </Text>
-            </View>
-            <View style={styles.locationContainer}>
-              <Ionicons
-                name="location-outline"
-                size={16}
-                color={Colors.text.secondary}
-              />
-              <Text style={styles.locationText}>{shiftData.location}</Text>
+            <View style={styles.header}>
+              <Text style={styles.title}>{shiftData.title}</Text>
+              <View style={styles.dateTimeContainer}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={20}
+                  color={Colors.text.secondary}
+                  style={styles.icon}
+                />
+                <Text style={styles.dateTime}>
+                  {shiftData.date} | {shiftData.time}
+                </Text>
+              </View>
+              <View style={styles.locationContainer}>
+                <Ionicons
+                  name="location-outline"
+                  size={20}
+                  color={Colors.text.secondary}
+                  style={styles.icon}
+                />
+                <Text style={styles.locationText}>{shiftData.location}</Text>
+              </View>
             </View>
 
             <View style={styles.section}>
@@ -113,45 +110,49 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  header: {
-    height: 300,
-    position: "relative",
-  },
-  headerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: Colors.overlay.medium,
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
   content: {
     flex: 1,
-    padding: 16,
+    padding: 24,
+  },
+  header: {
+    backgroundColor: Colors.cardBackground,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   title: {
     fontSize: 28,
     fontFamily: "BaruSans-Bold",
     color: Colors.text.primary,
-    marginBottom: 8,
+    marginBottom: 16,
   },
   dateTimeContainer: {
-    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  icon: {
+    marginRight: 8,
   },
   dateTime: {
     fontSize: 16,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: "BaruSans-Medium",
     color: Colors.text.secondary,
   },
   locationContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 24,
   },
   locationText: {
-    marginLeft: 4,
-    fontSize: 14,
-    fontFamily: "BaruSans-Regular",
+    fontSize: 16,
+    fontFamily: "BaruSans-Medium",
     color: Colors.text.secondary,
   },
   section: {
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
     fontFamily: "BaruSans-Regular",
     color: Colors.text.secondary,
     lineHeight: 24,
-    marginBottom: 16,
+    marginBottom: 24,
   },
   infoGrid: {
     flexDirection: "row",
@@ -199,7 +200,7 @@ const styles = StyleSheet.create({
     color: Colors.text.primary,
   },
   footer: {
-    padding: 16,
+    padding: 24,
     paddingBottom: 32,
   },
   signUpButton: {

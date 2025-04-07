@@ -117,3 +117,4 @@ export const getOrganizationById = (id: string) => {
   // Return default organization data if not found
   return mockUserData.organizations[0];
 };
+
