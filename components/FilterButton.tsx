@@ -3,6 +3,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
+import { Fonts } from "../constants/Fonts";
 
 interface FilterButtonProps {
   label: string;
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontFamily: "BaruSans-SemiBold",
+    fontFamily: Fonts.bold,
   },
 });
 

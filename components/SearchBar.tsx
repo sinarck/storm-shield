@@ -3,6 +3,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, TextInput, View } from "react-native";
+import { Fonts } from "../constants/Fonts";
 
 interface SearchBarProps {
   value: string;
@@ -74,7 +75,9 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
+    color: Colors.text.primary,
+    paddingVertical: 8,
   },
 });
 

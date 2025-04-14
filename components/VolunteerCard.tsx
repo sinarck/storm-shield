@@ -2,6 +2,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../constants/Colors";
+import { Fonts } from "../constants/Fonts";
 
 interface VolunteerCardProps {
   title: string;
@@ -68,14 +69,14 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   title: {
-    fontSize: 18,
-    fontFamily: "BaruSans-SemiBold",
+    fontSize: 16,
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
     marginBottom: 4,
   },
   description: {
     fontSize: 14,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
     marginBottom: 8,
   },
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     color: Colors.text.primary,
     fontSize: 14,
-    fontFamily: "BaruSans-Medium",
+    fontFamily: Fonts.medium,
   },
 });
 

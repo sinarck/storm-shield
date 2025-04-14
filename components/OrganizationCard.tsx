@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../constants/Colors";
+import { Fonts } from "../constants/Fonts";
 import { useHaptics } from "../hooks/useHaptics";
 
 interface OrganizationCardProps {
@@ -138,14 +139,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 17,
-    fontFamily: "BaruSans-SemiBold",
+    fontSize: 18,
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
     marginBottom: 4,
   },
   description: {
     fontSize: 14,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
     lineHeight: 20,
     marginBottom: 8,

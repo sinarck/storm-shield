@@ -2,6 +2,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Colors } from "../constants/Colors";
+import { Fonts } from "../constants/Fonts";
 
 interface AchievementCardProps {
   title: string;
@@ -63,13 +64,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontFamily: "BaruSans-SemiBold",
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
     marginBottom: 4,
   },
   description: {
     fontSize: 14,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
     lineHeight: 20,
   },

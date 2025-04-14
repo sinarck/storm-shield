@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../constants/Colors";
+import { Fonts } from "../constants/Fonts";
 import { useHaptics } from "../hooks/useHaptics";
 
 interface ShiftCardProps {
@@ -117,16 +118,16 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
-    fontSize: 18,
-    fontFamily: "BaruSans-SemiBold",
+    fontSize: 16,
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
     marginBottom: 4,
   },
   organizationName: {
     fontSize: 14,
-    fontFamily: "BaruSans-Medium",
-    color: Colors.text.primary,
-    opacity: 0.9,
+    fontFamily: Fonts.medium,
+    color: Colors.text.secondary,
+    marginBottom: 12,
   },
   detailsRow: {
     flexDirection: "row",
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 14,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
     flexShrink: 1,
   },

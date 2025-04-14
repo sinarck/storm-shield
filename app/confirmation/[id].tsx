@@ -5,6 +5,7 @@ import React from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { Spinner } from "../../components/Spinner";
 import { Colors } from "../../constants/Colors";
+import { Fonts } from "../../constants/Fonts";
 import { useShiftDetails } from "../../hooks/useApi";
 import { useHaptics } from "../../hooks/useHaptics";
 
@@ -213,19 +214,16 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontSize: 32,
-    fontFamily: "BaruSans-Bold",
+    fontSize: 24,
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
-    textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
-    textAlign: "center",
-    marginBottom: 32,
-    maxWidth: "85%",
+    marginBottom: 24,
   },
   shiftInfoCard: {
     backgroundColor: Colors.cardBackground,
@@ -238,13 +236,13 @@ const styles = StyleSheet.create({
   },
   shiftTitle: {
     fontSize: 18,
-    fontFamily: "BaruSans-SemiBold",
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
     marginBottom: 4,
   },
   shiftOrg: {
     fontSize: 14,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
     marginBottom: 16,
   },
@@ -259,7 +257,7 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 14,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
     flexShrink: 1,
   },
@@ -277,7 +275,7 @@ const styles = StyleSheet.create({
   },
   calendarButtonText: {
     fontSize: 16,
-    fontFamily: "BaruSans-SemiBold",
+    fontFamily: Fonts.bold,
     color: Colors.primary,
   },
   viewShiftButton: {
@@ -285,7 +283,7 @@ const styles = StyleSheet.create({
   },
   viewShiftButtonText: {
     fontSize: 16,
-    fontFamily: "BaruSans-SemiBold",
+    fontFamily: Fonts.bold,
     color: Colors.primary,
     textDecorationLine: "underline",
   },
@@ -311,15 +309,47 @@ const styles = StyleSheet.create({
   doneButtonText: {
     color: Colors.text.primary,
     fontSize: 16,
-    fontFamily: "BaruSans-SemiBold",
+    fontFamily: Fonts.bold,
   },
   errorText: {
     fontSize: 18,
-    fontFamily: "BaruSans-SemiBold",
+    fontFamily: Fonts.bold,
     color: Colors.status.error,
     textAlign: "center",
     marginTop: 16,
     marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: Fonts.bold,
+    color: Colors.text.primary,
+    marginBottom: 8,
+  },
+  sectionText: {
+    fontSize: 16,
+    fontFamily: Fonts.regular,
+    color: Colors.text.secondary,
+    marginBottom: 16,
+  },
+  detailsText: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.text.secondary,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontFamily: Fonts.bold,
+    color: Colors.text.primary,
+  },
+  linkText: {
+    fontSize: 16,
+    fontFamily: Fonts.bold,
+    color: Colors.primary,
+  },
+  confirmText: {
+    fontSize: 16,
+    fontFamily: Fonts.bold,
+    color: Colors.text.primary,
   },
 });
 

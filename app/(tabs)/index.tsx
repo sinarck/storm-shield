@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
@@ -7,6 +8,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -16,6 +18,7 @@ import { ShiftCard } from "../../components/ShiftCard";
 import { CardSkeleton, ListSkeleton } from "../../components/SkeletonLoader";
 import { Achievement, achievements } from "../../config/achievements";
 import { Colors } from "../../constants/Colors";
+import { Fonts } from "../../constants/Fonts";
 import {
   useOrganizations,
   useShifts,
@@ -155,10 +158,25 @@ export default function HomeScreen() {
     >
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>
-          Hello, {userProfile?.full_name || "Volunteer"}!
-        </Text>
-        <Text style={styles.headerSubtitle}>Ready to make an impact?</Text>
+        <View>
+          <Text style={styles.headerTitle}>
+            Hello, {userProfile?.full_name || "Volunteer"}!
+          </Text>
+          <Text style={styles.headerSubtitle}>Ready to make an impact?</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.notificationButton}
+          onPress={() => router.push("/notifications")}
+        >
+          <Ionicons
+            name="notifications-outline"
+            size={24}
+            color={Colors.text.primary}
+          />
+          <View style={styles.notificationBadge}>
+            <Text style={styles.notificationBadgeText}>3</Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
       {/* Monthly Goal */}
@@ -242,18 +260,21 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 24,
-    paddingTop: 60, // Increased padding
+    paddingTop: 60,
     paddingBottom: 24,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
   },
   headerTitle: {
     fontSize: 28,
-    fontFamily: "BaruSans-Bold",
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 16,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
   },
   sectionContainer: {
@@ -273,22 +294,19 @@ const styles = StyleSheet.create({
     marginBottom: 10, // Increased margin below header
   },
   sectionTitle: {
-    // Base title style used in Monthly Goal
     fontSize: 20,
-    fontFamily: "BaruSans-Bold",
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
-    marginBottom: 16, // Consistent margin below titles
+    marginBottom: 16,
   },
   sectionTitleNoMargin: {
-    // Used in SectionHeader or SectionContainerWithPadding
     fontSize: 20,
-    fontFamily: "BaruSans-Bold",
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
-    // No horizontal padding, no bottom margin (handled by parent)
   },
   viewMore: {
     fontSize: 14,
-    fontFamily: "BaruSans-SemiBold",
+    fontFamily: Fonts.bold,
     color: Colors.primary,
   },
   horizontalList: {
@@ -310,7 +328,7 @@ const styles = StyleSheet.create({
   },
   cardSectionTitle: {
     fontSize: 16,
-    fontFamily: "BaruSans-SemiBold",
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
     marginBottom: 12,
     alignSelf: "flex-start",
@@ -322,12 +340,12 @@ const styles = StyleSheet.create({
   },
   goalHours: {
     fontSize: 36,
-    fontFamily: "BaruSans-Bold",
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
   },
   goalTarget: {
     fontSize: 16,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
     marginLeft: 8,
   },
@@ -344,7 +362,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
     textAlign: "center",
     marginTop: 20,
@@ -377,6 +395,34 @@ const styles = StyleSheet.create({
   monthlyGoalOuterContainer: {
     paddingHorizontal: 24, // Add padding here
     marginBottom: 24,
+  },
+  notificationButton: {
+    position: "relative",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.cardBackground,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  notificationBadge: {
+    position: "absolute",
+    top: -4,
+    right: -4,
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 6,
+  },
+  notificationBadgeText: {
+    color: Colors.text.primary,
+    fontSize: 12,
+    fontFamily: Fonts.bold,
   },
 });
 

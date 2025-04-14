@@ -4,6 +4,7 @@ import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Spinner } from "../../components/Spinner";
 import { Colors } from "../../constants/Colors";
+import { Fonts } from "../../constants/Fonts";
 import { useRegisterForShift, useShiftDetails } from "../../hooks/useApi";
 import { useHaptics } from "../../hooks/useHaptics";
 
@@ -225,10 +226,10 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   title: {
-    fontSize: 26,
-    fontFamily: "BaruSans-Bold",
+    fontSize: 24,
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   dateTimeContainer: {
     flexDirection: "row",
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
   },
   dateTime: {
     fontSize: 16,
-    fontFamily: "BaruSans-Medium",
+    fontFamily: Fonts.medium,
     color: Colors.text.secondary,
   },
   locationContainer: {
@@ -252,13 +253,13 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 16,
-    fontFamily: "BaruSans-Medium",
+    fontFamily: Fonts.medium,
     color: Colors.text.secondary,
     flexShrink: 1, // Prevent long locations from breaking layout
   },
   organizationText: {
     fontSize: 14,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.muted,
     marginTop: 8,
   },
@@ -267,15 +268,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: "BaruSans-Bold",
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   description: {
     fontSize: 16,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
-    lineHeight: 24,
     marginBottom: 24,
   },
   infoGrid: {
@@ -298,13 +298,13 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 14,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.medium,
     color: Colors.text.secondary,
     marginBottom: 6,
   },
   infoValue: {
     fontSize: 16,
-    fontFamily: "BaruSans-Medium",
+    fontFamily: Fonts.medium,
     color: Colors.text.primary,
   },
   requirementsSection: {
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   },
   requirementsText: {
     fontSize: 15,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.primary,
     lineHeight: 22,
   },
@@ -354,18 +354,18 @@ const styles = StyleSheet.create({
   signUpButtonText: {
     color: Colors.text.primary,
     fontSize: 16,
-    fontFamily: "BaruSans-SemiBold",
+    fontFamily: Fonts.bold,
   },
   redirectText: {
     textAlign: "center",
     color: Colors.text.muted,
     fontSize: 12,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
   },
   errorText: {
-    fontSize: 16,
-    fontFamily: "BaruSans-Regular",
-    color: Colors.status.error,
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.text.secondary,
     textAlign: "center",
   },
 });

@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { ShiftCard } from "../../components/ShiftCard";
 import { Colors } from "../../constants/Colors";
+import { Fonts } from "../../constants/Fonts";
 import { useOrganizationDetails } from "../../hooks/useApi";
 import { OrganizationReview, Shift } from "../../services/api";
 
@@ -302,14 +303,14 @@ const styles = StyleSheet.create({
   },
   orgName: {
     fontSize: 26,
-    fontFamily: "BaruSans-Bold",
+    fontFamily: Fonts.bold,
     color: Colors.text.primary,
     textAlign: "center",
     marginBottom: 4,
   },
   orgLocation: {
     fontSize: 16,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
     marginBottom: 12,
   },
@@ -321,7 +322,7 @@ const styles = StyleSheet.create({
   ratingText: {
     marginLeft: 8,
     fontSize: 16,
-    fontFamily: "BaruSans-Medium",
+    fontFamily: Fonts.medium,
     color: Colors.text.secondary,
   },
   section: {
@@ -329,16 +330,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontFamily: "BaruSans-Bold",
+    fontSize: 18,
+    fontFamily: Fonts.medium,
     color: Colors.text.primary,
     marginBottom: 16,
   },
+  sectionHeading: {
+    fontSize: 20,
+    fontFamily: Fonts.bold,
+    color: Colors.text.primary,
+    marginBottom: 8,
+  },
   description: {
     fontSize: 16,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
-    lineHeight: 24,
+    marginBottom: 24,
   },
   contactRow: {
     flexDirection: "row",
@@ -352,13 +359,13 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: 15,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.secondary,
     flexShrink: 1,
   },
   contactTextLink: {
     fontSize: 15,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.primary, // Make links stand out
     textDecorationLine: "underline",
     flexShrink: 1,
@@ -373,7 +380,7 @@ const styles = StyleSheet.create({
   },
   reviewText: {
     fontSize: 15,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.primary,
     lineHeight: 22,
     marginTop: 8, // Space below rating
@@ -381,13 +388,13 @@ const styles = StyleSheet.create({
   },
   reviewDate: {
     fontSize: 12,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.text.muted,
     textAlign: "right",
   },
   errorText: {
     fontSize: 16,
-    fontFamily: "BaruSans-Regular",
+    fontFamily: Fonts.regular,
     color: Colors.status.error,
     textAlign: "center",
   },
@@ -443,6 +450,43 @@ const styles = StyleSheet.create({
   shiftContainer: {
     marginHorizontal: -24, // Compensate for section padding
     paddingHorizontal: 24,
+  },
+  title: {
+    fontSize: 24,
+    fontFamily: Fonts.bold,
+    color: Colors.text.primary,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    fontFamily: Fonts.regular,
+    color: Colors.text.secondary,
+    marginBottom: 24,
+  },
+  infoText: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.text.secondary,
+  },
+  detailsText: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.text.secondary,
+  },
+  statsText: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.text.secondary,
+  },
+  statsValue: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.text.secondary,
+  },
+  statsLabel: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.text.secondary,
   },
 });
 

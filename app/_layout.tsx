@@ -12,6 +12,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { Colors } from "../constants/Colors";
+import { Fonts } from "../constants/Fonts";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -19,19 +20,17 @@ SplashScreen.preventAutoHideAsync();
 // Create a client
 const queryClient = new QueryClient();
 
+const fonts = {
+  "Satoshi-Light": require("../assets/fonts/Satoshi-Light.otf"),
+  "Satoshi-Regular": require("../assets/fonts/Satoshi-Regular.otf"),
+  "Satoshi-Medium": require("../assets/fonts/Satoshi-Medium.otf"),
+  "Satoshi-Bold": require("../assets/fonts/Satoshi-Bold.otf"),
+  "Satoshi-Black": require("../assets/fonts/Satoshi-Black.otf"),
+};
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    "BaruSans-Thin": require("../assets/fonts/BaruSansDemo-Thin.otf"),
-    "BaruSans-ExtraLight": require("../assets/fonts/BaruSansDemo-ExtraLight.otf"),
-    "BaruSans-Light": require("../assets/fonts/BaruSansDemo-Light.otf"),
-    "BaruSans-Regular": require("../assets/fonts/BaruSansDemo-Regular.otf"),
-    "BaruSans-Medium": require("../assets/fonts/BaruSansDemo-Medium.otf"),
-    "BaruSans-SemiBold": require("../assets/fonts/BaruSansDemo-SemiBold.otf"),
-    "BaruSans-Bold": require("../assets/fonts/BaruSansDemo-Bold.otf"),
-    "BaruSans-ExtraBold": require("../assets/fonts/BaruSansDemo-ExtraBold.otf"),
-    "BaruSans-Black": require("../assets/fonts/BaruSansDemo-Black.otf"),
-  });
+  const [loaded] = useFonts(fonts);
 
   useEffect(() => {
     if (loaded) {
@@ -53,7 +52,7 @@ export default function RootLayout() {
             },
             headerTintColor: Colors.text.primary,
             headerTitleStyle: {
-              fontFamily: "BaruSans-SemiBold",
+              fontFamily: Fonts.medium,
             },
           }}
         >
