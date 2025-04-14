@@ -1,109 +1,200 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Linking from "expo-linking";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React from "react";
-import {
-  Linking,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { getShiftById } from "../../config/mockData";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Spinner } from "../../components/Spinner";
 import { Colors } from "../../constants/Colors";
+import { useShiftDetails } from "../../hooks/useApi";
+import { useHaptics } from "../../hooks/useHaptics";
 
-export default function ShiftConfirmation() {
+export default function ConfirmationScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const shiftId = id ? parseInt(id, 10) : null;
 
-  // Get shift data from mock data
-  const shiftData = getShiftById(id || "1");
+  const triggerSuccess = useHaptics("success");
+  const triggerMedium = useHaptics("medium");
+  const triggerWarning = useHaptics("warning");
+
+  const { data: shiftData, isLoading, error } = useShiftDetails(shiftId);
 
   /**
-   * Open Google Calendar to add the shift
+   * Navigate back to the home screen (replace stack)
    */
-  const handleAddToCalendar = () => {
-    // For Google Calendar, we'd create a URL like this:
-    const title = encodeURIComponent(shiftData.title);
-    const location = encodeURIComponent(shiftData.location);
-    // Convert date and time to proper format for calendar
-    // This is simplified - in a real app, you'd parse the date/time properly
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&location=${location}&dates=20241208T150000Z/20241208T180000Z`;
-
-    Linking.openURL(googleCalendarUrl);
+  const handleDone = async () => {
+    await triggerMedium();
+    // Navigate to the home tab, replacing the stack
+    router.dismissAll();
+    router.replace("/(tabs)");
+    // If the above still warns, try navigating directly:
+    // router.navigate("/(tabs)/index");
   };
 
   /**
-   * Navigate to home and reset navigation stack
+   * Navigate to the specific shift details page again (replace stack)
    */
-  const handleViewMoreOpportunities = () => {
-    // Replace the entire navigation stack with just the home route
-    router.replace("/");
+  const handleViewShift = async () => {
+    if (!shiftId) return;
+    await triggerMedium();
+    // Replace current screen with shift details
+    router.replace(`/shift/${shiftId}`);
   };
+
+  /**
+   * Attempts to create a calendar event URL.
+   * Basic implementation, needs robust date/time parsing.
+   */
+  const handleAddToCalendar = async () => {
+    if (!shiftData) return;
+
+    await triggerMedium();
+
+    try {
+      // Combine date and time - VERY basic, assumes YYYY-MM-DD and HH:MM:SS format
+      const startTimeStr = `${shiftData.date}T${shiftData.start_time}Z`; // Assume UTC for simplicity
+      const endTimeStr = `${shiftData.date}T${shiftData.end_time}Z`;
+
+      // Format for Google Calendar URL (YYYYMMDDTHHMMSSZ)
+      const formatGCAL = (isoStr: string) => isoStr.replace(/[-:]/g, "");
+
+      const gcalUrl =
+        `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+        `&text=${encodeURIComponent(shiftData.title)}` +
+        `&dates=${formatGCAL(startTimeStr)}/${formatGCAL(endTimeStr)}` +
+        `&location=${encodeURIComponent(shiftData.location || "")}` +
+        `&details=${encodeURIComponent(
+          `Volunteer shift for ${
+            shiftData.organizations?.name || "Unknown Org"
+          }. ${shiftData.description || ""}`
+        )}`;
+
+      // Try opening the URL
+      const supported = await Linking.canOpenURL(gcalUrl);
+      if (supported) {
+        await Linking.openURL(gcalUrl);
+      } else {
+        await triggerWarning();
+        Alert.alert(
+          "Cannot Open Calendar",
+          "Could not find an application to open the calendar link."
+        );
+      }
+    } catch (error) {
+      await triggerWarning();
+      console.error("Error creating calendar link:", error);
+      Alert.alert("Error", "Could not create calendar event link.");
+    }
+  };
+
+  React.useEffect(() => {
+    // Trigger success haptic when screen loads
+    triggerSuccess();
+  }, []);
+
+  // --- Render Loading/Error ---
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <Spinner size={48} color={Colors.primary} />
+      </View>
+    );
+  }
+
+  if (error || !shiftData) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <Ionicons
+          name="warning-outline"
+          size={64}
+          color={Colors.status.error}
+        />
+        <Text style={styles.errorText}>Could not load shift details.</Text>
+        <Pressable style={styles.doneButton} onPress={handleDone}>
+          <Text style={styles.doneButtonText}>Go Home</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  // --- Main Render ---
+  const formattedDate = new Date(shiftData.date).toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const formattedTime = `${shiftData.start_time.substring(
+    0,
+    5
+  )} - ${shiftData.end_time.substring(0, 5)}`;
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: "Confirmation",
-          headerStyle: {
-            backgroundColor: Colors.background,
-          },
-          headerTintColor: Colors.text.primary,
-          // Prevent going back
-          headerBackVisible: false,
-          gestureEnabled: false,
-        }}
-      />
-      <SafeAreaView style={styles.container}>
-        <View style={styles.content}>
-          <View style={styles.successIcon}>
-            <Ionicons name="checkmark" size={36} color={Colors.text.primary} />
-          </View>
+    <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: false, gestureEnabled: false }} />
+      <View style={styles.iconContainer}>
+        <Ionicons
+          name="checkmark-circle-outline"
+          size={120}
+          color={Colors.status.success}
+        />
+      </View>
+      <Text style={styles.title}>You're All Set!</Text>
+      <Text style={styles.subtitle}>
+        You've successfully signed up for the following shift:
+      </Text>
 
-          <Text style={styles.title}>
-            You're All Set for Your Upcoming Shift!
-          </Text>
-
-          <Text style={styles.message}>
-            We'll send you a reminder 24 hours before your shift. Make sure to
-            arrive on time and wear closed-toe shoes!
-          </Text>
-
-          <View style={styles.shiftCard}>
-            <Text style={styles.shiftTitle}>{shiftData.title}</Text>
-            <Text style={styles.shiftDate}>
-              {shiftData.date} | {shiftData.time}
-            </Text>
-            <View style={styles.locationContainer}>
-              <Ionicons
-                name="location-outline"
-                size={16}
-                color={Colors.text.secondary}
-              />
-              <Text style={styles.locationText}>{shiftData.location}</Text>
-            </View>
-          </View>
-
-          <Pressable
-            style={styles.calendarButton}
-            onPress={handleAddToCalendar}
-            android_ripple={{ color: "rgba(255,255,255,0.2)" }}
-          >
-            <Text style={styles.buttonText}>Add to Calendar</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.opportunitiesButton}
-            onPress={handleViewMoreOpportunities}
-            android_ripple={{ color: "rgba(255,255,255,0.1)" }}
-          >
-            <Text style={styles.opportunitiesText}>
-              View More Opportunities
-            </Text>
-          </Pressable>
+      <View style={styles.shiftInfoCard}>
+        <Text style={styles.shiftTitle}>{shiftData.title}</Text>
+        <Text style={styles.shiftOrg}>
+          {shiftData.organizations?.name || "Unknown Org"}
+        </Text>
+        <View style={styles.detailsRow}>
+          <Ionicons
+            name="calendar-outline"
+            size={16}
+            color={Colors.text.secondary}
+            style={styles.detailIcon}
+          />
+          <Text style={styles.detailText}>{formattedDate}</Text>
         </View>
-      </SafeAreaView>
-    </>
+        <View style={styles.detailsRow}>
+          <Ionicons
+            name="time-outline"
+            size={16}
+            color={Colors.text.secondary}
+            style={styles.detailIcon}
+          />
+          <Text style={styles.detailText}>{formattedTime}</Text>
+        </View>
+        <View style={styles.detailsRow}>
+          <Ionicons
+            name="location-outline"
+            size={16}
+            color={Colors.text.secondary}
+            style={styles.detailIcon}
+          />
+          <Text style={styles.detailText}>
+            {shiftData.location || "Location TBD"}
+          </Text>
+        </View>
+      </View>
+
+      <Pressable style={styles.calendarButton} onPress={handleAddToCalendar}>
+        <Ionicons
+          name="calendar-outline"
+          size={20}
+          color={Colors.primary}
+          style={{ marginRight: 8 }}
+        />
+        <Text style={styles.calendarButtonText}>Add to Calendar</Text>
+      </Pressable>
+
+      <View style={styles.footer}>
+        <Pressable style={styles.doneButton} onPress={handleDone}>
+          <Text style={styles.doneButtonText}>Done</Text>
+        </Pressable>
+      </View>
+    </View>
   );
 }
 
@@ -111,112 +202,124 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-  },
-  content: {
-    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
     padding: 24,
-    alignItems: "center",
+  },
+  centerContent: {
     justifyContent: "center",
   },
-  successIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.primary + "20",
-    justifyContent: "center",
-    alignItems: "center",
+  iconContainer: {
     marginBottom: 24,
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontFamily: "BaruSans-Bold",
     color: Colors.text.primary,
     textAlign: "center",
-    marginBottom: 16,
+    marginBottom: 12,
   },
-  message: {
+  subtitle: {
     fontSize: 16,
     fontFamily: "BaruSans-Regular",
     color: Colors.text.secondary,
     textAlign: "center",
     marginBottom: 32,
-    paddingHorizontal: 16,
-    lineHeight: 24,
+    maxWidth: "85%",
   },
-  shiftCard: {
-    width: "100%",
+  shiftInfoCard: {
     backgroundColor: Colors.cardBackground,
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 20,
+    width: "100%",
     marginBottom: 24,
     borderWidth: 1,
     borderColor: Colors.border,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
   },
   shiftTitle: {
     fontSize: 18,
-    fontFamily: "BaruSans-Medium",
+    fontFamily: "BaruSans-SemiBold",
     color: Colors.text.primary,
     marginBottom: 4,
   },
-  shiftDate: {
+  shiftOrg: {
     fontSize: 14,
     fontFamily: "BaruSans-Regular",
     color: Colors.text.secondary,
-    marginBottom: 8,
+    marginBottom: 16,
   },
-  locationContainer: {
+  detailsRow: {
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 8,
   },
-  locationText: {
-    marginLeft: 4,
+  detailIcon: {
+    marginRight: 10,
+    width: 18,
+  },
+  detailText: {
     fontSize: 14,
     fontFamily: "BaruSans-Regular",
     color: Colors.text.secondary,
+    flexShrink: 1,
   },
   calendarButton: {
-    width: "100%",
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    padding: 16,
+    flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: Colors.cardBackground, // Subtle button style
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: Colors.border,
-    shadowColor: "#000",
+    marginBottom: 16,
+  },
+  calendarButtonText: {
+    fontSize: 16,
+    fontFamily: "BaruSans-SemiBold",
+    color: Colors.primary,
+  },
+  viewShiftButton: {
+    marginBottom: 24, // Adjust spacing
+  },
+  viewShiftButtonText: {
+    fontSize: 16,
+    fontFamily: "BaruSans-SemiBold",
+    color: Colors.primary,
+    textDecorationLine: "underline",
+  },
+  footer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 24,
+    paddingBottom: 40, // Safe area padding
+  },
+  doneButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: "center",
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 5,
   },
-  buttonText: {
+  doneButtonText: {
     color: Colors.text.primary,
     fontSize: 16,
     fontFamily: "BaruSans-SemiBold",
   },
-  opportunitiesButton: {
-    width: "100%",
-    backgroundColor: Colors.cardBackground,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: Colors.border,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  opportunitiesText: {
-    color: Colors.text.primary,
-    fontSize: 16,
+  errorText: {
+    fontSize: 18,
     fontFamily: "BaruSans-SemiBold",
+    color: Colors.status.error,
+    textAlign: "center",
+    marginTop: 16,
+    marginBottom: 24,
   },
 });
 

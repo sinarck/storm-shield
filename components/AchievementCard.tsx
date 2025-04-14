@@ -1,8 +1,7 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Colors } from "../constants/Colors";
-import { useHaptics } from "../hooks/useHaptics";
 
 interface AchievementCardProps {
   title: string;
@@ -11,25 +10,15 @@ interface AchievementCardProps {
 }
 
 /**
- * Card component for displaying user achievements
+ * Card component for displaying user achievements (non-interactive)
  */
 export const AchievementCard: React.FC<AchievementCardProps> = ({
   title,
   description,
   icon,
 }) => {
-  const triggerHaptic = useHaptics("light");
-
-  const handlePress = async () => {
-    await triggerHaptic();
-  };
-
   return (
-    <Pressable
-      onPress={handlePress}
-      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
-      android_ripple={{ color: "rgba(255,255,255,0.1)" }}
-    >
+    <View style={styles.container}>
       <View style={styles.iconContainer}>
         <FontAwesome5 name={icon} size={24} color={Colors.text.accent} />
       </View>
@@ -37,7 +26,7 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
       </View>
-    </Pressable>
+    </View>
   );
 };
 
@@ -52,14 +41,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: Colors.border,
-    shadowColor: "#000",
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
     elevation: 4,
-  },
-  pressed: {
-    opacity: 0.85,
   },
   iconContainer: {
     width: 52,

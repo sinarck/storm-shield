@@ -1,21 +1,26 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../constants/Colors";
 import { useHaptics } from "../hooks/useHaptics";
 
 interface OrganizationCardProps {
+  id: number;
   title: string;
   description: string;
-  imageUrl: string;
+  imageUrl?: string | null;
   rating: number;
   onPress?: () => void;
 }
+
+const DEFAULT_ORG_IMAGE = "https://via.placeholder.com/100?text=Org";
 
 /**
  * Card component for displaying organization information
  */
 export const OrganizationCard: React.FC<OrganizationCardProps> = ({
+  id,
   title,
   description,
   imageUrl,
@@ -26,41 +31,75 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({
 
   const handlePress = async () => {
     await triggerHaptic();
-    onPress?.();
+    if (onPress) {
+      onPress();
+    } else {
+      router.navigate(`/organization/${id}`);
+    }
+  };
+
+  const RatingStars = ({ rating }: { rating: number }) => {
+    const totalStars = 5;
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 >= 0.5;
+    const emptyStars = totalStars - fullStars - (halfStar ? 1 : 0);
+
+    return (
+      <View style={styles.ratingContainer}>
+        {[...Array(fullStars)].map((_, i) => (
+          <FontAwesome
+            key={`full_${i}`}
+            name="star"
+            size={14}
+            color={Colors.rating}
+          />
+        ))}
+        {halfStar && (
+          <FontAwesome
+            key="half"
+            name="star-half-full"
+            size={14}
+            color={Colors.rating}
+          />
+        )}
+        {[...Array(emptyStars)].map((_, i) => (
+          <FontAwesome
+            key={`empty_${i}`}
+            name="star-o"
+            size={14}
+            color={Colors.rating}
+          />
+        ))}
+      </View>
+    );
   };
 
   return (
     <Pressable
       onPress={handlePress}
       style={({ pressed }) => [styles.container, pressed && styles.pressed]}
-      android_ripple={{ color: "rgba(255,255,255,0.1)" }}
+      android_ripple={{ color: Colors.overlay.light }}
     >
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: imageUrl }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-        <View style={styles.imageOverlay} />
-        <View style={styles.ratingBadge}>
-          <FontAwesome name="star" size={12} color={Colors.rating} />
-          <Text style={styles.ratingText}>{rating.toFixed(1)}</Text>
-        </View>
-      </View>
+      {/* <Image
+        source={{ uri: imageUrl || DEFAULT_ORG_IMAGE }}
+        style={styles.image}
+      /> */}
       <View style={styles.content}>
         <Text style={styles.title} numberOfLines={1}>
           {title}
         </Text>
-        <View style={styles.descriptionContainer}>
-          <Ionicons
-            name="information-circle-outline"
-            size={14}
-            color={Colors.text.secondary}
-            style={styles.infoIcon}
-          />
-          <Text style={styles.description} numberOfLines={1}>
-            {description}
-          </Text>
+        <Text style={styles.description} numberOfLines={2}>
+          {description}
+        </Text>
+        <View style={styles.footer}>
+          <RatingStars rating={rating} />
+          <View style={styles.arrowContainer}>
+            <Ionicons
+              name="arrow-forward"
+              size={18}
+              color={Colors.text.muted}
+            />
+          </View>
         </View>
       </View>
     </Pressable>
@@ -71,70 +110,59 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.cardBackground,
     borderRadius: 16,
-    overflow: "hidden",
+    padding: 16,
     marginVertical: 8,
     marginHorizontal: 16,
-    shadowColor: "#000",
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
     elevation: 4,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
   pressed: {
     opacity: 0.85,
-  },
-  imageContainer: {
-    position: "relative",
-    height: 160,
+    transform: [{ scale: 0.98 }],
   },
   image: {
-    width: "100%",
-    height: "100%",
-  },
-  imageOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.2)",
-  },
-  ratingBadge: {
-    position: "absolute",
-    bottom: 12,
-    right: 12,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  ratingText: {
-    color: Colors.text.primary,
-    fontSize: 12,
-    fontFamily: "BaruSans-Medium",
-    marginLeft: 4,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    marginRight: 16,
+    backgroundColor: Colors.border,
   },
   content: {
-    padding: 16,
+    flex: 1,
   },
   title: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: "BaruSans-SemiBold",
     color: Colors.text.primary,
-    marginBottom: 8,
-  },
-  descriptionContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  infoIcon: {
-    marginRight: 4,
+    marginBottom: 4,
   },
   description: {
-    flex: 1,
     fontSize: 14,
     fontFamily: "BaruSans-Regular",
     color: Colors.text.secondary,
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
+  arrowContainer: {
+    // Style if needed, pushes arrow to the right
   },
 });
 

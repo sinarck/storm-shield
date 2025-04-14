@@ -14,6 +14,7 @@ export const Colors = {
   background: "#080808", // Darker background for more contrast
   cardBackground: "#151515", // Slightly darker card background
   border: "#272727", // Slightly lighter border for better definition
+  skeletonBackground: "#202020", // Added skeleton color
   text: {
     primary: "#FFFFFF",
     secondary: "#A0A0A0",
@@ -40,6 +41,13 @@ export const Colors = {
   error: "#F44336",
   warning: "#FF9800",
   info: "#2196F3",
+  status: {
+    success: "#28a745",
+    warning: "#ffc107",
+    error: "#dc3545",
+    info: "#17a2b8",
+  },
+  shadow: "rgba(0, 0, 0, 0.6)",
   light: {
     text: "#11181C",
     background: "#fff",
