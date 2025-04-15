@@ -1,37 +1,24 @@
 /**
- * Learn more about light and dark modes:
- * https://docs.expo.dev/guides/color-schemes/
+ * Simple color hook that returns a single color value
  */
 
 import { Colors } from "@/constants/Colors";
-import { useTheme } from "@/contexts/ThemeContext";
-
-type ColorValue = {
-  light: string;
-  dark: string;
-};
 
 type NestedColorValue = {
-  [key: string]: ColorValue;
+  [key: string]: string;
 };
 
 type ColorPath = {
-  [K in keyof typeof Colors]: (typeof Colors)[K] extends ColorValue
+  [K in keyof typeof Colors]: (typeof Colors)[K] extends string
     ? K
     : (typeof Colors)[K] extends NestedColorValue
     ? `${K}.${keyof (typeof Colors)[K] & string}`
     : never;
 }[keyof typeof Colors];
 
-export function useThemeColor(
-  props: { light?: string; dark?: string },
-  colorName: ColorPath
-) {
-  const { isDark } = useTheme();
-  const colorFromProps = props[isDark ? "dark" : "light"];
-
-  if (colorFromProps) {
-    return colorFromProps;
+export function useThemeColor(props: { color?: string }, colorName: ColorPath) {
+  if (props.color) {
+    return props.color;
   } else {
     const [first, second] = colorName.split(".") as [
       keyof typeof Colors,
@@ -39,9 +26,9 @@ export function useThemeColor(
     ];
     if (second) {
       const nestedColor = Colors[first] as NestedColorValue;
-      return nestedColor[second][isDark ? "dark" : "light"];
+      return nestedColor[second];
     }
-    return (Colors[first] as ColorValue)[isDark ? "dark" : "light"];
+    return Colors[first] as string;
   }
 }
 

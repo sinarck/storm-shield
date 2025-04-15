@@ -19,3 +19,4 @@ export const FontMapping = {
   "BaruSans-ExtraBold": Fonts.black,
   "BaruSans-Black": Fonts.black,
 } as const;
+
