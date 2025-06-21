@@ -20,7 +20,6 @@ import { Achievement, achievements } from "../../config/achievements";
 import { Colors } from "../../constants/Colors";
 import { Fonts } from "../../constants/Fonts";
 import { useOrganizations, useShifts } from "../../hooks/useApi";
-import { useOnboarding } from "../../hooks/useOnboarding";
 import { useStoredUserProfile } from "../../hooks/useUserProfile";
 import { Organization, ShiftWithOrganization } from "../../services/api";
 
@@ -30,7 +29,6 @@ const DEFAULT_ORG_IMAGE = "https://via.placeholder.com/100?text=Org";
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [tapCount, setTapCount] = useState(0);
-  const { resetOnboarding } = useOnboarding();
 
   // --- Data Fetching ---
   const { userProfile: storedUserProfile } = useStoredUserProfile();
@@ -55,20 +53,6 @@ export default function HomeScreen() {
       setRefreshing(false);
     }
   }, [refetchOrgs, refetchShifts]);
-
-  // Hidden reset onboarding feature (tap title 5 times)
-  const handleTitlePress = () => {
-    const newCount = tapCount + 1;
-    setTapCount(newCount);
-
-    if (newCount >= 5) {
-      resetOnboarding();
-      setTapCount(0);
-    }
-
-    // Reset count after 3 seconds
-    setTimeout(() => setTapCount(0), 3000);
-  };
 
   // --- Render Functions ---
   const renderOrganizationItem = ({ item }: { item: Organization }) => (
@@ -169,27 +153,12 @@ export default function HomeScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Pressable onPress={handleTitlePress}>
-            <Text style={styles.headerTitle}>
-              Hello, {storedUserProfile?.fullName || "Volunteer"}!
-            </Text>
-          </Pressable>
+          <Text style={styles.headerTitle}>
+            Hello, {storedUserProfile?.fullName || "Volunteer"}!
+          </Text>
           <Text style={styles.headerSubtitle}>Ready to make an impact?</Text>
         </View>
         <View style={styles.headerButtons}>
-          <TouchableOpacity
-            style={styles.testButton}
-            onPress={() => {
-              resetOnboarding();
-              router.push("/onboarding");
-            }}
-          >
-            <Ionicons
-              name="settings-outline"
-              size={20}
-              color={Colors.text.secondary}
-            />
-          </TouchableOpacity>
           <TouchableOpacity
             style={styles.notificationButton}
             onPress={() => router.push("/notifications")}
