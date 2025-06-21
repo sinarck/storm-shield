@@ -13,12 +13,16 @@ export type ShiftWithOrganization = Shift & {
   organizations: Pick<Organization, "id" | "name" | "logo_url"> | null;
 };
 
+export type OrganizationReviewWithUser = OrganizationReview & {
+  users: Pick<User, "full_name"> | null;
+};
+
 export type OrganizationWithReviews = Organization & {
-  organization_reviews: OrganizationReview[];
+  organization_reviews: OrganizationReviewWithUser[];
 };
 
 export type OrganizationWithReviewsAndShifts = Organization & {
-  organization_reviews: OrganizationReview[];
+  organization_reviews: OrganizationReviewWithUser[];
   shifts: Shift[]; // Add shifts relationship
 };
 
@@ -38,8 +42,8 @@ export const api = {
   ): Promise<OrganizationWithReviewsAndShifts | null> => {
     const { data, error } = await supabase
       .from("organizations")
-      // Fetch reviews and shifts associated with this org
-      .select("*, organization_reviews(*), shifts(*)")
+      // Fetch reviews with user names and shifts associated with this org
+      .select("*, organization_reviews(*, users(full_name)), shifts(*)")
       .eq("id", id)
       .single();
     if (error) {

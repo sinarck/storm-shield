@@ -19,11 +19,9 @@ import { CardSkeleton, ListSkeleton } from "../../components/SkeletonLoader";
 import { Achievement, achievements } from "../../config/achievements";
 import { Colors } from "../../constants/Colors";
 import { Fonts } from "../../constants/Fonts";
-import {
-  useOrganizations,
-  useShifts,
-  useUserProfile,
-} from "../../hooks/useApi";
+import { useOrganizations, useShifts } from "../../hooks/useApi";
+import { useOnboarding } from "../../hooks/useOnboarding";
+import { useStoredUserProfile } from "../../hooks/useUserProfile";
 import { Organization, ShiftWithOrganization } from "../../services/api";
 
 // Placeholder image URL
@@ -31,13 +29,11 @@ const DEFAULT_ORG_IMAGE = "https://via.placeholder.com/100?text=Org";
 
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
+  const [tapCount, setTapCount] = useState(0);
+  const { resetOnboarding } = useOnboarding();
 
   // --- Data Fetching ---
-  const {
-    data: userProfile,
-    isLoading: isLoadingProfile,
-    refetch: refetchProfile,
-  } = useUserProfile(1);
+  const { userProfile: storedUserProfile } = useStoredUserProfile();
   const {
     data: organizations,
     isLoading: isLoadingOrgs,
@@ -52,13 +48,27 @@ export default function HomeScreen() {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await Promise.all([refetchProfile(), refetchOrgs(), refetchShifts()]);
+      await Promise.all([refetchOrgs(), refetchShifts()]);
     } catch (error) {
       console.error("Error refreshing data:", error);
     } finally {
       setRefreshing(false);
     }
-  }, [refetchProfile, refetchOrgs, refetchShifts]);
+  }, [refetchOrgs, refetchShifts]);
+
+  // Hidden reset onboarding feature (tap title 5 times)
+  const handleTitlePress = () => {
+    const newCount = tapCount + 1;
+    setTapCount(newCount);
+
+    if (newCount >= 5) {
+      resetOnboarding();
+      setTapCount(0);
+    }
+
+    // Reset count after 3 seconds
+    setTimeout(() => setTapCount(0), 3000);
+  };
 
   // --- Render Functions ---
   const renderOrganizationItem = ({ item }: { item: Organization }) => (
@@ -99,7 +109,7 @@ export default function HomeScreen() {
   );
 
   // --- Loading State ---
-  if (isLoadingProfile || isLoadingOrgs || isLoadingShifts) {
+  if (isLoadingOrgs || isLoadingShifts) {
     return (
       <ScrollView
         style={styles.container}
@@ -159,9 +169,11 @@ export default function HomeScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>
-            Hello, {userProfile?.full_name || "Volunteer"}!
-          </Text>
+          <Pressable onPress={handleTitlePress}>
+            <Text style={styles.headerTitle}>
+              Hello, {storedUserProfile?.fullName || "Volunteer"}!
+            </Text>
+          </Pressable>
           <Text style={styles.headerSubtitle}>Ready to make an impact?</Text>
         </View>
         <TouchableOpacity
@@ -185,18 +197,11 @@ export default function HomeScreen() {
         <View style={styles.monthlyGoalCard}>
           <Text style={styles.cardSectionTitle}>Hours Volunteered</Text>
           <View style={styles.goalProgressContainer}>
-            <Text style={styles.goalHours}>
-              {userProfile?.total_hours || 0}
-            </Text>
+            <Text style={styles.goalHours}>0</Text>
             <Text style={styles.goalTarget}>/ 10 hours</Text>
           </View>
           <View style={styles.progressBarBackground}>
-            <View
-              style={[
-                styles.progressBarFill,
-                { width: `${((userProfile?.total_hours || 0) / 10) * 100}%` },
-              ]}
-            />
+            <View style={[styles.progressBarFill, { width: "0%" }]} />
           </View>
         </View>
       </View>

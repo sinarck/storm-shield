@@ -13,6 +13,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { Colors } from "../constants/Colors";
 import { Fonts } from "../constants/Fonts";
+import { useOnboarding } from "../hooks/useOnboarding";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -31,14 +32,15 @@ const fonts = {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts(fonts);
+  const { hasOnboarded, isLoading: isOnboardingLoading } = useOnboarding();
 
   useEffect(() => {
-    if (loaded) {
+    if (loaded && !isOnboardingLoading) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, isOnboardingLoading]);
 
-  if (!loaded) {
+  if (!loaded || isOnboardingLoading) {
     return null;
   }
 
@@ -56,6 +58,10 @@ export default function RootLayout() {
             },
           }}
         >
+          {/* Onboarding Screen - No header */}
+          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+
+          {/* Main App Screens */}
           <Stack.Screen
             name="(tabs)/explore"
             options={{ headerTitle: "Explore" }}

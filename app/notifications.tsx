@@ -1,8 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
+import { formatDistanceToNow } from "date-fns";
 import { Stack } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,33 +13,53 @@ import {
 } from "react-native";
 import { Colors } from "../constants/Colors";
 import { Fonts } from "../constants/Fonts";
+import { useHaptics } from "../hooks/useHaptics";
 
 // Mock notification data - in real app, this would come from an API
 const mockNotifications = [
   {
     id: 1,
     type: "alert",
-    title: "Privacy Policy Updated",
-    message: "Make sure you know how these changes affect you.",
-    date: "Dec 1, 2024",
+    title: "Flood Warning",
+    message:
+      "Flash flood warning issued for San Mateo County. Volunteers needed for evacuation...",
+    date: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
     read: false,
   },
   {
     id: 2,
     type: "reminder",
-    title: "Upcoming Shift Reminder",
+    title: "Shift Reminder",
     message:
-      "Your shift at North Texas Food Bank is scheduled for Dec 8, 3 PM - 6 PM.",
-    date: "Dec 5, 2024",
-    read: false,
+      "Your food distribution shift at SF Food Bank is tomorrow at 9:00 AM.",
+    date: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
+    read: true,
   },
   {
     id: 3,
     type: "achievement",
-    title: "Congratulations!",
+    title: "Message from Bay Area Relief",
     message:
-      "You've hit a major milestone in your volunteering journey. Keep it up!",
-    date: "Nov 30, 2024",
+      "Thank you for signing up! We look forward to your help with shelter setup this weeke...",
+    date: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
+    read: false,
+  },
+  {
+    id: 4,
+    type: "default",
+    title: "Profile Updated",
+    message:
+      "Your profile skills have been updated to include First Aid certification.",
+    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+    read: true,
+  },
+  {
+    id: 5,
+    type: "alert",
+    title: "High Wind Advisory",
+    message:
+      "High wind advisory for coastal areas. Tree removal volunteers needed in affected nei...",
+    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
     read: true,
   },
 ];
@@ -46,6 +68,21 @@ export default function NotificationsScreen() {
   const [activeTab, setActiveTab] = useState("all");
   const [notifications, setNotifications] =
     useState<(typeof mockNotifications)[0][]>(mockNotifications);
+  const [refreshing, setRefreshing] = useState(false);
+  const playHaptic = useHaptics("medium");
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    playHaptic();
+
+    // Simulate fetching new data
+    setTimeout(() => {
+      // In a real app, you would fetch new notifications here
+      // For this demo, we'll just re-set the mock data
+      setNotifications([...mockNotifications].reverse()); // Reverse to show a change
+      setRefreshing(false);
+    }, 1500);
+  }, [playHaptic]);
 
   const filteredNotifications = useMemo(() => {
     if (activeTab === "important") {
@@ -69,6 +106,16 @@ export default function NotificationsScreen() {
     }
   };
 
+  const handleMarkAsRead = (id: number) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    );
+  };
+
+  const handleMarkAllAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
   const renderNotification = (notification: (typeof mockNotifications)[0]) => (
     <Pressable
       key={notification.id}
@@ -76,21 +123,30 @@ export default function NotificationsScreen() {
         styles.notificationItem,
         !notification.read && styles.unreadNotification,
       ]}
-      onPress={() => {
-        // Handle notification press
-      }}
+      onPress={() => handleMarkAsRead(notification.id)}
     >
       <View style={styles.notificationIcon}>
         <Ionicons
           name={getIconForType(notification.type)}
           size={24}
-          color={Colors.primary}
+          color={notification.type === "alert" ? Colors.error : Colors.primary}
         />
       </View>
       <View style={styles.notificationContent}>
-        <Text style={styles.notificationTitle}>{notification.title}</Text>
-        <Text style={styles.notificationMessage}>{notification.message}</Text>
-        <Text style={styles.notificationDate}>{notification.date}</Text>
+        <View style={styles.notificationHeader}>
+          <Text style={styles.notificationTitle}>{notification.title}</Text>
+          <Text style={styles.notificationDate}>
+            {formatDistanceToNow(notification.date, { addSuffix: true })}
+          </Text>
+        </View>
+        <Text style={styles.notificationMessage} numberOfLines={2}>
+          {notification.message}
+        </Text>
+        {!notification.read && (
+          <TouchableOpacity onPress={() => handleMarkAsRead(notification.id)}>
+            <Text style={styles.markReadText}>Mark as read</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </Pressable>
   );
@@ -149,12 +205,17 @@ export default function NotificationsScreen() {
           </View>
         </View>
 
-        <ScrollView style={styles.notificationsList}>
+        <ScrollView
+          style={styles.notificationsList}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Latest</Text>
-              <TouchableOpacity>
-                <Text style={styles.markAllRead}>Mark as read</Text>
+              <TouchableOpacity onPress={handleMarkAllAsRead}>
+                <Text style={styles.markAllRead}>Mark all as read</Text>
               </TouchableOpacity>
             </View>
             {filteredNotifications.length > 0 ? (
@@ -233,42 +294,48 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.cardBackground,
     borderRadius: 12,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
   unreadNotification: {
-    backgroundColor: Colors.cardBackground,
-    borderLeftWidth: 3,
+    borderLeftWidth: 4,
     borderLeftColor: Colors.primary,
   },
   notificationIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.background,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
+    marginRight: 16,
+    marginTop: 2,
   },
   notificationContent: {
     flex: 1,
+  },
+  notificationHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 4,
   },
   notificationTitle: {
     fontSize: 16,
     fontFamily: Fonts.bold,
     color: Colors.text.primary,
-    marginBottom: 4,
+    flex: 1,
+    marginRight: 8,
+  },
+  notificationDate: {
+    fontSize: 12,
+    fontFamily: Fonts.regular,
+    color: Colors.text.secondary,
   },
   notificationMessage: {
     fontSize: 14,
     fontFamily: Fonts.regular,
     color: Colors.text.secondary,
     marginBottom: 8,
+    lineHeight: 20,
   },
-  notificationDate: {
-    fontSize: 12,
-    fontFamily: Fonts.regular,
-    color: Colors.text.secondary,
+  markReadText: {
+    fontSize: 14,
+    fontFamily: Fonts.medium,
+    color: Colors.primary,
+    marginTop: 4,
   },
   emptyText: {
     paddingVertical: 32,

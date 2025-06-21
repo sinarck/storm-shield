@@ -1,22 +1,24 @@
 import { Redirect } from "expo-router";
 import React from "react";
+import { useOnboarding } from "../hooks/useOnboarding";
 
 /**
  * Root entry point for the app.
- * Redirects to the first tab of the main application layout.
+ * Redirects based on onboarding status.
  */
 export default function RootIndex() {
-  // For now, directly redirect.
-  // In the future, you could add logic here for auth checks, loading initial config, etc.
-  // If initial loading/checks were needed, you might show a loading indicator first.
+  const { hasOnboarded, isLoading } = useOnboarding();
 
-  // return (
-  //   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background }}>
-  //      <ActivityIndicator size="large" color={Colors.primary} />
-  //   </View>
-  // );
+  // Show loading state while checking onboarding status
+  if (isLoading) {
+    return null; // This will show the splash screen
+  }
 
-  // Redirect to the base path of the tabs layout
-  return <Redirect href="/(tabs)" />;
+  // Redirect based on onboarding status
+  if (hasOnboarded) {
+    return <Redirect href="/(tabs)" />;
+  } else {
+    return <Redirect href="/onboarding" />;
+  }
 }
 

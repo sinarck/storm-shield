@@ -9,11 +9,12 @@ import {
   Text,
   View,
 } from "react-native";
+import { ReviewCard } from "../../components/ReviewCard";
 import { ShiftCard } from "../../components/ShiftCard";
 import { Colors } from "../../constants/Colors";
 import { Fonts } from "../../constants/Fonts";
 import { useOrganizationDetails } from "../../hooks/useApi";
-import { OrganizationReview, Shift } from "../../services/api";
+import { Shift } from "../../services/api";
 
 // Placeholder Image URL
 const DEFAULT_ORG_IMAGE = "https://via.placeholder.com/150?text=Org+Logo";
@@ -45,6 +46,7 @@ const RatingStars = ({ rating }: { rating: number }) => {
 
   return (
     <View style={styles.ratingContainer}>
+      <Text style={styles.ratingText}>{rating.toFixed(1)}</Text>
       {[...Array(fullStars)].map((_, i) => (
         <FontAwesome
           key={`full_${i}`}
@@ -69,7 +71,6 @@ const RatingStars = ({ rating }: { rating: number }) => {
           color={Colors.rating}
         />
       ))}
-      {/* <Text style={styles.ratingText}>{rating.toFixed(1)}</Text> */}
     </View>
   );
 };
@@ -247,23 +248,9 @@ export default function OrganizationDetailsScreen() {
           organizationData.organization_reviews.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Volunteer Reviews</Text>
-              {organizationData.organization_reviews.map(
-                (review: OrganizationReview) => (
-                  <View key={review.id} style={styles.reviewCard}>
-                    {review.rating != null && (
-                      <RatingStars rating={review.rating} />
-                    )}
-                    <Text style={styles.reviewText}>
-                      {review.review || "No comment provided."}
-                    </Text>
-                    {/* Could add user name here if fetched */}
-                    <Text style={styles.reviewDate}>
-                      Reviewed on:{" "}
-                      {new Date(review.created_at).toLocaleDateString()}
-                    </Text>
-                  </View>
-                )
-              )}
+              {organizationData.organization_reviews.map((review) => (
+                <ReviewCard key={review.id} review={review} />
+              ))}
             </View>
           )}
       </ScrollView>
@@ -320,7 +307,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   ratingText: {
-    marginLeft: 8,
+    marginRight: 8,
     fontSize: 16,
     fontFamily: Fonts.medium,
     color: Colors.text.secondary,

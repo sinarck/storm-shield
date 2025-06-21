@@ -18,6 +18,7 @@ export const Colors = {
   text: {
     primary: "#FFFFFF",
     secondary: "#A1A1A1",
+    tertiary: "#E5E5E5",
     accent: "#B8A1FF", // Lighter purple for accents
     muted: "#737373", // For less important text
   },

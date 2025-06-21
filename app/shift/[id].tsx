@@ -72,6 +72,14 @@ export default function ShiftDetailsScreen() {
   }
 
   // --- Main Render ---
+  // Add mock skills data until API provides it
+  const shiftWithSkills = {
+    ...shiftData,
+    skills: ["Customer Service", "Event Support", "Communication", "Teamwork"],
+    info_callout:
+      "Please arrive 15 minutes early for check-in and orientation. Bring a water bottle and wear comfortable clothes suitable for the weather.",
+  };
+
   const formattedDate = new Date(shiftData.date).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -166,6 +174,37 @@ export default function ShiftDetailsScreen() {
                 </View>
               )}
             </View>
+
+            {/* Skills Section */}
+            {shiftWithSkills.skills && shiftWithSkills.skills.length > 0 && (
+              <View>
+                <Text style={styles.sectionTitle}>Skills Needed</Text>
+                <View style={styles.skillsContainer}>
+                  {shiftWithSkills.skills.map((skill, index) => (
+                    <View key={index} style={styles.skillChip}>
+                      <Text style={styles.skillText}>{skill}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Info Callout Section */}
+            {shiftWithSkills.info_callout && (
+              <View style={{ marginBottom: 24 }}>
+                <View style={styles.infoCallout}>
+                  <Ionicons
+                    name="information-circle-outline"
+                    size={24}
+                    color={Colors.text.secondary}
+                    style={styles.infoCalloutIcon}
+                  />
+                  <Text style={styles.infoCalloutText}>
+                    {shiftWithSkills.info_callout}
+                  </Text>
+                </View>
+              </View>
+            )}
           </View>
         </ScrollView>
 
@@ -264,7 +303,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   section: {
-    // marginBottom: 24,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 20,
@@ -367,6 +406,44 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
     color: Colors.text.secondary,
     textAlign: "center",
+  },
+  skillsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 8,
+  },
+  skillChip: {
+    backgroundColor: Colors.cardBackground,
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginRight: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  skillText: {
+    fontSize: 14,
+    fontFamily: Fonts.medium,
+    color: Colors.text.primary,
+  },
+  infoCallout: {
+    backgroundColor: Colors.cardBackground,
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 16,
+  },
+  infoCalloutIcon: {
+    marginRight: 12,
+  },
+  infoCalloutText: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.text.secondary,
+    lineHeight: 20,
   },
 });
 

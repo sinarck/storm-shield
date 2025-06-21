@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   organizationName: {
     fontSize: 14,
     fontFamily: Fonts.medium,
-    color: Colors.text.secondary,
+    color: Colors.text.tertiary,
     marginBottom: 12,
   },
   detailsRow: {
