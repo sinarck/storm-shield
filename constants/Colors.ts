@@ -17,7 +17,7 @@ export const Colors = {
   skeletonBackground: "#202020", // Added skeleton color
   text: {
     primary: "#FFFFFF",
-    secondary: "#A0A0A0",
+    secondary: "#A1A1A1",
     accent: "#B8A1FF", // Lighter purple for accents
     muted: "#737373", // For less important text
   },

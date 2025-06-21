@@ -21,7 +21,6 @@ export default function ExploreScreen() {
         5
       )}`}
       location={item.location || "Remote"}
-      imageUrl={null}
       onPress={() => router.navigate(`/shift/${item.id}`)}
     />
   );

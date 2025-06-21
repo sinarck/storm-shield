@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Stack } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -44,6 +44,17 @@ const mockNotifications = [
 
 export default function NotificationsScreen() {
   const [activeTab, setActiveTab] = useState("all");
+  const [notifications, setNotifications] =
+    useState<(typeof mockNotifications)[0][]>(mockNotifications);
+
+  const filteredNotifications = useMemo(() => {
+    if (activeTab === "important") {
+      return notifications.filter(
+        (n) => n.type === "alert" || n.type === "reminder"
+      );
+    }
+    return notifications;
+  }, [activeTab, notifications]);
 
   const getIconForType = (type: string) => {
     switch (type) {
@@ -116,7 +127,7 @@ export default function NotificationsScreen() {
                   activeTab === "all" && styles.activeSegmentText,
                 ]}
               >
-                notifications
+                All
               </Text>
             </Pressable>
             <Pressable
@@ -132,7 +143,7 @@ export default function NotificationsScreen() {
                   activeTab === "important" && styles.activeSegmentText,
                 ]}
               >
-                important alerts
+                Important Alerts
               </Text>
             </Pressable>
           </View>
@@ -146,7 +157,13 @@ export default function NotificationsScreen() {
                 <Text style={styles.markAllRead}>Mark as read</Text>
               </TouchableOpacity>
             </View>
-            {mockNotifications.map(renderNotification)}
+            {filteredNotifications.length > 0 ? (
+              filteredNotifications.map(renderNotification)
+            ) : (
+              <Text style={styles.emptyText}>
+                No important alerts right now.
+              </Text>
+            )}
           </View>
         </ScrollView>
       </View>
@@ -251,6 +268,12 @@ const styles = StyleSheet.create({
   notificationDate: {
     fontSize: 12,
     fontFamily: Fonts.regular,
+    color: Colors.text.secondary,
+  },
+  emptyText: {
+    paddingVertical: 32,
+    textAlign: "center",
+    fontSize: 16,
     color: Colors.text.secondary,
   },
 });
