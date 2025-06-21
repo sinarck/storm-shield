@@ -16,9 +16,6 @@ import { Fonts } from "../../constants/Fonts";
 import { useOrganizationDetails } from "../../hooks/useApi";
 import { Shift } from "../../services/api";
 
-// Placeholder Image URL
-const DEFAULT_ORG_IMAGE = "https://via.placeholder.com/150?text=Org+Logo";
-
 // Basic Skeleton for Org Details
 const OrgDetailSkeleton = () => (
   <View style={styles.skeletonContainer}>

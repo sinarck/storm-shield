@@ -7,8 +7,9 @@ const USER_PROFILE_KEY = "userProfile";
 export interface UserProfile {
   fullName: string;
   age: string;
+  addressLine1: string;
+  addressLine2?: string;
   zipCode: string;
-  address: string;
   email: string;
   phone: string;
   emergencyContact: string;
@@ -85,3 +86,4 @@ export const useOnboarding = () => {
     resetOnboarding,
   };
 };
+

@@ -32,7 +32,7 @@ const fonts = {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts(fonts);
-  const { hasOnboarded, isLoading: isOnboardingLoading } = useOnboarding();
+  const { isLoading: isOnboardingLoading } = useOnboarding();
 
   useEffect(() => {
     if (loaded && !isOnboardingLoading) {

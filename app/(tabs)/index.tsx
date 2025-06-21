@@ -176,19 +176,34 @@ export default function HomeScreen() {
           </Pressable>
           <Text style={styles.headerSubtitle}>Ready to make an impact?</Text>
         </View>
-        <TouchableOpacity
-          style={styles.notificationButton}
-          onPress={() => router.push("/notifications")}
-        >
-          <Ionicons
-            name="notifications-outline"
-            size={24}
-            color={Colors.text.primary}
-          />
-          <View style={styles.notificationBadge}>
-            <Text style={styles.notificationBadgeText}>3</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.testButton}
+            onPress={() => {
+              resetOnboarding();
+              router.push("/onboarding");
+            }}
+          >
+            <Ionicons
+              name="settings-outline"
+              size={20}
+              color={Colors.text.secondary}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.notificationButton}
+            onPress={() => router.push("/notifications")}
+          >
+            <Ionicons
+              name="notifications-outline"
+              size={24}
+              color={Colors.text.primary}
+            />
+            <View style={styles.notificationBadge}>
+              <Text style={styles.notificationBadgeText}>3</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Monthly Goal */}
@@ -428,6 +443,21 @@ const styles = StyleSheet.create({
     color: Colors.text.primary,
     fontSize: 12,
     fontFamily: Fonts.bold,
+  },
+  headerButtons: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  testButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.cardBackground,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginRight: 8,
   },
 });
 

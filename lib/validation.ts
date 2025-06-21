@@ -70,3 +70,4 @@ export const validateField = (field: keyof OnboardingFormData, value: any) => {
     return { isValid: false, error: "Invalid field" };
   }
 };
+

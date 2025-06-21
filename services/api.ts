@@ -10,7 +10,10 @@ export type OrganizationReview = Tables<"organization_reviews">;
 
 // Define types for joined data
 export type ShiftWithOrganization = Shift & {
-  organizations: Pick<Organization, "id" | "name" | "logo_url"> | null;
+  organizations: Pick<
+    Organization,
+    "id" | "name" | "logo_url" | "website_url" | "contact_phone"
+  > | null;
 };
 
 export type OrganizationReviewWithUser = OrganizationReview & {
@@ -58,7 +61,9 @@ export const api = {
   getShifts: async (): Promise<ShiftWithOrganization[]> => {
     const { data, error } = await supabase
       .from("shifts")
-      .select("*, organizations(id, name, logo_url)"); // Join with organization details
+      .select(
+        "*, organizations(id, name, logo_url, website_url, contact_phone)"
+      ); // Join with organization details
     if (error) {
       console.error("Error fetching shifts:", error);
       throw error;
@@ -70,7 +75,9 @@ export const api = {
   getShiftById: async (id: number): Promise<ShiftWithOrganization | null> => {
     const { data, error } = await supabase
       .from("shifts")
-      .select("*, organizations(id, name, logo_url)")
+      .select(
+        "*, organizations(id, name, logo_url, website_url, contact_phone)"
+      )
       .eq("id", id)
       .single();
     if (error) {

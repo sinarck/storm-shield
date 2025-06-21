@@ -1,6 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect } from "react";
-import { Animated, Easing } from "react-native";
+import React, { useEffect, useMemo } from "react";
+import { Animated, StyleSheet, View } from "react-native";
 import { Colors } from "../constants/Colors";
 
 interface SpinnerProps {
@@ -9,20 +8,22 @@ interface SpinnerProps {
 }
 
 export const Spinner: React.FC<SpinnerProps> = ({
-  size = 32,
-  color = Colors.text.secondary,
+  size = 24,
+  color = Colors.primary,
 }) => {
-  const spinValue = new Animated.Value(0);
+  const spinValue = useMemo(() => new Animated.Value(0), []);
 
   useEffect(() => {
-    Animated.loop(
+    const spin = Animated.loop(
       Animated.timing(spinValue, {
         toValue: 1,
-        duration: 1000, // Rotation speed
-        easing: Easing.linear,
-        useNativeDriver: true, // Use native driver for performance
+        duration: 1000,
+        useNativeDriver: true,
       })
-    ).start();
+    );
+    spin.start();
+
+    return () => spin.stop();
   }, [spinValue]);
 
   const spin = spinValue.interpolate({
@@ -31,12 +32,33 @@ export const Spinner: React.FC<SpinnerProps> = ({
   });
 
   return (
-    <Animated.View style={{ transform: [{ rotate: spin }] }}>
-      <Ionicons
-        name="refresh" // Or choose another icon like 'sync' or 'aperture'
-        size={size}
-        color={color}
+    <View style={styles.container}>
+      <Animated.View
+        style={[
+          styles.spinner,
+          {
+            width: size,
+            height: size,
+            borderColor: color,
+            borderTopColor: "transparent",
+            transform: [{ rotate: spin }],
+          },
+        ]}
       />
-    </Animated.View>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  spinner: {
+    borderWidth: 2,
+    borderStyle: "solid",
+    borderRadius: 100,
+    padding: 5,
+  },
+});
+
