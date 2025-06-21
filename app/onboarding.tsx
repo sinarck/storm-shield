@@ -12,6 +12,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../constants/Colors";
 import { Fonts } from "../constants/Fonts";
 import { useHaptics } from "../hooks/useHaptics";
@@ -47,6 +48,190 @@ const INTERESTS_OPTIONS = [
   "Mental Health",
 ];
 
+type StringUserProfileKeys =
+  | "fullName"
+  | "age"
+  | "zipCode"
+  | "addressLine1"
+  | "addressLine2"
+  | "city"
+  | "state"
+  | "email"
+  | "phone"
+  | "emergencyContact"
+  | "emergencyPhone";
+
+interface InfoStepProps {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  subtitle: string;
+  features: {
+    icon: keyof typeof Ionicons.glyphMap;
+    text: string;
+    color?: string;
+  }[];
+  logo?: boolean;
+  iconColor?: string;
+}
+
+const InfoStep = ({
+  icon,
+  title,
+  subtitle,
+  features,
+  iconColor,
+}: InfoStepProps) => (
+  <View style={styles.welcomeContainer}>
+    <View style={styles.welcomeIcon}>
+      <Ionicons name={icon} size={80} color={iconColor || Colors.primary} />
+    </View>
+    <Text style={styles.welcomeTitle}>{title}</Text>
+    <Text style={styles.welcomeSubtitle}>{subtitle}</Text>
+    <View style={styles.featureList}>
+      {features.map((feature, index) => (
+        <View style={styles.featureItem} key={index}>
+          <Ionicons
+            name={feature.icon}
+            size={24}
+            color={feature.color || Colors.success}
+          />
+          <Text style={styles.featureText}>{feature.text}</Text>
+        </View>
+      ))}
+    </View>
+  </View>
+);
+
+interface FormField {
+  name: StringUserProfileKeys;
+  label: string;
+  placeholder: string;
+  keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
+  multiline?: boolean;
+}
+
+interface FormStepProps {
+  fields: FormField[];
+  formData: Partial<UserProfile>;
+  updateFormData: (field: keyof UserProfile, value: any) => void;
+}
+
+const FormStep = ({ fields, formData, updateFormData }: FormStepProps) => (
+  <View style={styles.formContainer}>
+    {fields.map((field) => (
+      <View style={styles.inputGroup} key={field.name}>
+        <Text style={styles.inputLabel}>{field.label}</Text>
+        <TextInput
+          style={[styles.textInput, field.multiline && styles.textArea]}
+          value={formData[field.name]}
+          onChangeText={(text) => updateFormData(field.name, text)}
+          placeholder={field.placeholder}
+          placeholderTextColor={Colors.text.muted}
+          keyboardType={field.keyboardType || "default"}
+          autoCapitalize={field.autoCapitalize || "sentences"}
+          multiline={field.multiline || false}
+          numberOfLines={field.multiline ? 3 : 1}
+        />
+      </View>
+    ))}
+  </View>
+);
+
+interface SkillsInterestsStepProps {
+  formData: Partial<UserProfile>;
+  toggleSkill: (skill: string) => void;
+  toggleInterest: (interest: string) => void;
+}
+
+const SkillsInterestsStep = ({
+  formData,
+  toggleSkill,
+  toggleInterest,
+}: SkillsInterestsStepProps) => (
+  <View style={styles.formContainer}>
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Skills & Certifications</Text>
+      <Text style={styles.sectionDescription}>
+        Select any skills or certifications you have (select all that apply)
+      </Text>
+      <View style={styles.chipContainer}>
+        {SKILLS_OPTIONS.map((skill) => (
+          <Pressable
+            key={skill}
+            style={[
+              styles.chip,
+              (formData.skills || []).includes(skill) && styles.chipSelected,
+            ]}
+            onPress={() => toggleSkill(skill)}
+          >
+            <Text
+              style={[
+                styles.chipText,
+                (formData.skills || []).includes(skill) &&
+                  styles.chipTextSelected,
+              ]}
+            >
+              {skill}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Areas of Interest</Text>
+      <Text style={styles.sectionDescription}>
+        What types of volunteer work interest you most?
+      </Text>
+      <View style={styles.chipContainer}>
+        {INTERESTS_OPTIONS.map((interest) => (
+          <Pressable
+            key={interest}
+            style={[
+              styles.chip,
+              (formData.interests || []).includes(interest) &&
+                styles.chipSelected,
+            ]}
+            onPress={() => toggleInterest(interest)}
+          >
+            <Text
+              style={[
+                styles.chipText,
+                (formData.interests || []).includes(interest) &&
+                  styles.chipTextSelected,
+              ]}
+            >
+              {interest}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  </View>
+);
+
+interface InfoContent {
+  type: "info";
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  subtitle: string;
+  features: {
+    icon: keyof typeof Ionicons.glyphMap;
+    text: string;
+    color?: string;
+  }[];
+}
+interface FormContent {
+  type: "form";
+  fields: FormField[];
+}
+interface SkillsInterestsContent {
+  type: "skills_interests";
+}
+
+type StepContent = InfoContent | FormContent | SkillsInterestsContent;
+
 export default function OnboardingScreen() {
   const { completeOnboarding } = useOnboarding();
   const triggerHaptic = useHaptics("medium");
@@ -57,7 +242,10 @@ export default function OnboardingScreen() {
     fullName: "",
     age: "",
     zipCode: "",
-    address: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
     email: "",
     phone: "",
     emergencyContact: "",
@@ -66,40 +254,185 @@ export default function OnboardingScreen() {
     interests: [],
   });
 
-  const steps = [
+  const stepsConfig: {
+    title: string;
+    subtitle: string;
+    description: string;
+    content: StepContent;
+    validate?: (data: Partial<UserProfile>) => boolean;
+  }[] = [
     {
-      title: "Welcome to Storm Shield",
-      subtitle: "Let's get to know you better",
-      description:
-        "We're excited to have you join our community of volunteers making a difference.",
+      title: "",
+      subtitle: "",
+      description: "",
+      content: {
+        type: "info",
+        icon: "shield-checkmark",
+        title: "Welcome to Storm Shield",
+        subtitle:
+          "Your gateway to meaningful volunteer opportunities in disaster relief and community service.",
+        features: [
+          {
+            icon: "checkmark-circle",
+            text: "Find local volunteer opportunities",
+            color: Colors.success,
+          },
+          {
+            icon: "checkmark-circle",
+            text: "Track your impact and achievements",
+            color: Colors.success,
+          },
+          {
+            icon: "checkmark-circle",
+            text: "Connect with organizations",
+            color: Colors.success,
+          },
+        ],
+      },
     },
     {
       title: "Personal Information",
       subtitle: "Basic details about you",
       description: "This helps us match you with the right opportunities.",
+      content: {
+        type: "form",
+        fields: [
+          {
+            name: "fullName",
+            label: "Full Name *",
+            placeholder: "Enter your full name",
+          },
+          {
+            name: "age",
+            label: "Age *",
+            placeholder: "Enter your age",
+            keyboardType: "numeric",
+          },
+          {
+            name: "addressLine1",
+            label: "Address Line 1 *",
+            placeholder: "Enter your address",
+          },
+          {
+            name: "addressLine2",
+            label: "Address Line 2",
+            placeholder: "Apartment, suite, etc. (optional)",
+          },
+          {
+            name: "city",
+            label: "City *",
+            placeholder: "Enter your city",
+          },
+          {
+            name: "state",
+            label: "State *",
+            placeholder: "Enter your state",
+          },
+          {
+            name: "zipCode",
+            label: "Zip Code *",
+            placeholder: "Enter your zip code",
+            keyboardType: "numeric",
+          },
+        ],
+      },
+      validate: (data: Partial<UserProfile>) =>
+        !!(
+          data.fullName &&
+          data.age &&
+          data.addressLine1 &&
+          data.city &&
+          data.state &&
+          data.zipCode
+        ),
     },
     {
       title: "Contact Information",
       subtitle: "How we can reach you",
       description:
         "We'll use this to keep you updated about volunteer opportunities.",
+      content: {
+        type: "form",
+        fields: [
+          {
+            name: "email",
+            label: "Email Address *",
+            placeholder: "Enter your email",
+            keyboardType: "email-address",
+            autoCapitalize: "none",
+          },
+          {
+            name: "phone",
+            label: "Phone Number *",
+            placeholder: "Enter your phone number",
+            keyboardType: "phone-pad",
+          },
+        ],
+      },
+      validate: (data: Partial<UserProfile>) => !!(data.email && data.phone),
     },
     {
       title: "Emergency Contact",
       subtitle: "Safety first",
       description: "In case of emergencies during volunteer activities.",
+      content: {
+        type: "form",
+        fields: [
+          {
+            name: "emergencyContact",
+            label: "Emergency Contact Name *",
+            placeholder: "Enter emergency contact name",
+          },
+          {
+            name: "emergencyPhone",
+            label: "Emergency Contact Phone *",
+            placeholder: "Enter emergency contact phone",
+            keyboardType: "phone-pad",
+          },
+        ],
+      },
+      validate: (data: Partial<UserProfile>) =>
+        !!(data.emergencyContact && data.emergencyPhone),
     },
     {
       title: "Skills & Interests",
       subtitle: "What you bring to the table",
       description:
         "This helps us match you with the most suitable volunteer opportunities.",
+      content: {
+        type: "skills_interests",
+      },
+      validate: (data: Partial<UserProfile>) =>
+        (data.skills?.length || 0) > 0 && (data.interests?.length || 0) > 0,
     },
     {
-      title: "You're All Set!",
-      subtitle: "Ready to make an impact",
-      description:
-        "Thank you for joining our community. Let's start making a difference together!",
+      title: "",
+      subtitle: "",
+      description: "",
+      content: {
+        type: "info",
+        icon: "rocket",
+        title: "You're All Set!",
+        subtitle:
+          "Thank you for joining our community of volunteers. You're now ready to start making a difference in your community.",
+        features: [
+          {
+            icon: "search",
+            text: "Browse volunteer opportunities",
+            color: Colors.primary,
+          },
+          {
+            icon: "calendar",
+            text: "Sign up for shifts",
+            color: Colors.primary,
+          },
+          {
+            icon: "trophy",
+            text: "Track your achievements",
+            color: Colors.primary,
+          },
+        ],
+      },
     },
   ];
 
@@ -124,27 +457,17 @@ export default function OnboardingScreen() {
   };
 
   const validateStep = (step: number): boolean => {
-    switch (step) {
-      case 1:
-        return !!(formData.fullName && formData.age && formData.zipCode);
-      case 2:
-        return !!(formData.email && formData.phone);
-      case 3:
-        return !!(formData.emergencyContact && formData.emergencyPhone);
-      case 4:
-        return (
-          (formData.skills?.length || 0) > 0 &&
-          (formData.interests?.length || 0) > 0
-        );
-      default:
-        return true;
+    const stepConfig = stepsConfig[step];
+    if (stepConfig.validate) {
+      return stepConfig.validate(formData);
     }
+    return true;
   };
 
   const handleNext = async () => {
     await triggerHaptic();
 
-    if (currentStep === steps.length - 1) {
+    if (currentStep === stepsConfig.length - 1) {
       // Complete onboarding
       try {
         await triggerSuccess();
@@ -167,339 +490,117 @@ export default function OnboardingScreen() {
   };
 
   const renderStepContent = () => {
-    switch (currentStep) {
-      case 0:
+    const stepConfig = stepsConfig[currentStep];
+    const { content } = stepConfig;
+
+    switch (content.type) {
+      case "info":
+        return <InfoStep {...content} />;
+      case "form":
         return (
-          <View style={styles.welcomeContainer}>
-            <View style={styles.welcomeIcon}>
-              <Ionicons
-                name="shield-checkmark"
-                size={80}
-                color={Colors.primary}
-              />
-            </View>
-            <Text style={styles.welcomeTitle}>Welcome to Storm Shield</Text>
-            <Text style={styles.welcomeSubtitle}>
-              Your gateway to meaningful volunteer opportunities in disaster
-              relief and community service.
-            </Text>
-            <View style={styles.featureList}>
-              <View style={styles.featureItem}>
-                <Ionicons
-                  name="checkmark-circle"
-                  size={24}
-                  color={Colors.success}
-                />
-                <Text style={styles.featureText}>
-                  Find local volunteer opportunities
-                </Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Ionicons
-                  name="checkmark-circle"
-                  size={24}
-                  color={Colors.success}
-                />
-                <Text style={styles.featureText}>
-                  Track your impact and achievements
-                </Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Ionicons
-                  name="checkmark-circle"
-                  size={24}
-                  color={Colors.success}
-                />
-                <Text style={styles.featureText}>
-                  Connect with organizations
-                </Text>
-              </View>
-            </View>
-          </View>
+          <FormStep
+            fields={content.fields}
+            formData={formData}
+            updateFormData={updateFormData}
+          />
         );
-
-      case 1:
+      case "skills_interests":
         return (
-          <View style={styles.formContainer}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Full Name *</Text>
-              <TextInput
-                style={styles.textInput}
-                value={formData.fullName}
-                onChangeText={(text) => updateFormData("fullName", text)}
-                placeholder="Enter your full name"
-                placeholderTextColor={Colors.text.muted}
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Age *</Text>
-              <TextInput
-                style={styles.textInput}
-                value={formData.age}
-                onChangeText={(text) => updateFormData("age", text)}
-                placeholder="Enter your age"
-                placeholderTextColor={Colors.text.muted}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Zip Code *</Text>
-              <TextInput
-                style={styles.textInput}
-                value={formData.zipCode}
-                onChangeText={(text) => updateFormData("zipCode", text)}
-                placeholder="Enter your zip code"
-                placeholderTextColor={Colors.text.muted}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Address</Text>
-              <TextInput
-                style={[styles.textInput, styles.textArea]}
-                value={formData.address}
-                onChangeText={(text) => updateFormData("address", text)}
-                placeholder="Enter your address"
-                placeholderTextColor={Colors.text.muted}
-                multiline
-                numberOfLines={3}
-              />
-            </View>
-          </View>
+          <SkillsInterestsStep
+            formData={formData}
+            toggleSkill={toggleSkill}
+            toggleInterest={toggleInterest}
+          />
         );
-
-      case 2:
-        return (
-          <View style={styles.formContainer}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Email Address *</Text>
-              <TextInput
-                style={styles.textInput}
-                value={formData.email}
-                onChangeText={(text) => updateFormData("email", text)}
-                placeholder="Enter your email"
-                placeholderTextColor={Colors.text.muted}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Phone Number *</Text>
-              <TextInput
-                style={styles.textInput}
-                value={formData.phone}
-                onChangeText={(text) => updateFormData("phone", text)}
-                placeholder="Enter your phone number"
-                placeholderTextColor={Colors.text.muted}
-                keyboardType="phone-pad"
-              />
-            </View>
-          </View>
-        );
-
-      case 3:
-        return (
-          <View style={styles.formContainer}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Emergency Contact Name *</Text>
-              <TextInput
-                style={styles.textInput}
-                value={formData.emergencyContact}
-                onChangeText={(text) =>
-                  updateFormData("emergencyContact", text)
-                }
-                placeholder="Enter emergency contact name"
-                placeholderTextColor={Colors.text.muted}
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Emergency Contact Phone *</Text>
-              <TextInput
-                style={styles.textInput}
-                value={formData.emergencyPhone}
-                onChangeText={(text) => updateFormData("emergencyPhone", text)}
-                placeholder="Enter emergency contact phone"
-                placeholderTextColor={Colors.text.muted}
-                keyboardType="phone-pad"
-              />
-            </View>
-          </View>
-        );
-
-      case 4:
-        return (
-          <View style={styles.formContainer}>
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Skills & Certifications</Text>
-              <Text style={styles.sectionDescription}>
-                Select any skills or certifications you have (select all that
-                apply)
-              </Text>
-              <View style={styles.chipContainer}>
-                {SKILLS_OPTIONS.map((skill) => (
-                  <Pressable
-                    key={skill}
-                    style={[
-                      styles.chip,
-                      (formData.skills || []).includes(skill) &&
-                        styles.chipSelected,
-                    ]}
-                    onPress={() => toggleSkill(skill)}
-                  >
-                    <Text
-                      style={[
-                        styles.chipText,
-                        (formData.skills || []).includes(skill) &&
-                          styles.chipTextSelected,
-                      ]}
-                    >
-                      {skill}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Areas of Interest</Text>
-              <Text style={styles.sectionDescription}>
-                What types of volunteer work interest you most?
-              </Text>
-              <View style={styles.chipContainer}>
-                {INTERESTS_OPTIONS.map((interest) => (
-                  <Pressable
-                    key={interest}
-                    style={[
-                      styles.chip,
-                      (formData.interests || []).includes(interest) &&
-                        styles.chipSelected,
-                    ]}
-                    onPress={() => toggleInterest(interest)}
-                  >
-                    <Text
-                      style={[
-                        styles.chipText,
-                        (formData.interests || []).includes(interest) &&
-                          styles.chipTextSelected,
-                      ]}
-                    >
-                      {interest}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            </View>
-          </View>
-        );
-
-      case 5:
-        return (
-          <View style={styles.welcomeContainer}>
-            <View style={styles.welcomeIcon}>
-              <Ionicons name="rocket" size={80} color={Colors.primary} />
-            </View>
-            <Text style={styles.welcomeTitle}>You're All Set!</Text>
-            <Text style={styles.welcomeSubtitle}>
-              Thank you for joining our community of volunteers. You're now
-              ready to start making a difference in your community.
-            </Text>
-            <View style={styles.featureList}>
-              <View style={styles.featureItem}>
-                <Ionicons name="search" size={24} color={Colors.primary} />
-                <Text style={styles.featureText}>
-                  Browse volunteer opportunities
-                </Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Ionicons name="calendar" size={24} color={Colors.primary} />
-                <Text style={styles.featureText}>Sign up for shifts</Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Ionicons name="trophy" size={24} color={Colors.primary} />
-                <Text style={styles.featureText}>Track your achievements</Text>
-              </View>
-            </View>
-          </View>
-        );
-
       default:
         return null;
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        {/* Progress Bar */}
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
-            <View
-              style={[
-                styles.progressFill,
-                { width: `${((currentStep + 1) / steps.length) * 100}%` },
-              ]}
-            />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Step Header */}
+          {stepsConfig[currentStep].title ? (
+            <View style={styles.header}>
+              <Text style={styles.stepTitle}>
+                {stepsConfig[currentStep].title}
+              </Text>
+              <Text style={styles.stepSubtitle}>
+                {stepsConfig[currentStep].subtitle}
+              </Text>
+              <Text style={styles.stepDescription}>
+                {stepsConfig[currentStep].description}
+              </Text>
+            </View>
+          ) : null}
+
+          {/* Step Content */}
+          {renderStepContent()}
+        </ScrollView>
+
+        {/* Navigation Buttons */}
+        <View style={styles.footer}>
+          {/* Progress Bar */}
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <View
+                style={[
+                  styles.progressFill,
+                  {
+                    width: `${((currentStep + 1) / stepsConfig.length) * 100}%`,
+                  },
+                ]}
+              />
+            </View>
+            <Text style={styles.progressText}>
+              {currentStep + 1} of {stepsConfig.length}
+            </Text>
           </View>
-          <Text style={styles.progressText}>
-            {currentStep + 1} of {steps.length}
-          </Text>
-        </View>
-
-        {/* Step Header */}
-        <View style={styles.header}>
-          <Text style={styles.stepTitle}>{steps[currentStep].title}</Text>
-          <Text style={styles.stepSubtitle}>{steps[currentStep].subtitle}</Text>
-          <Text style={styles.stepDescription}>
-            {steps[currentStep].description}
-          </Text>
-        </View>
-
-        {/* Step Content */}
-        {renderStepContent()}
-      </ScrollView>
-
-      {/* Navigation Buttons */}
-      <View style={styles.footer}>
-        <View style={styles.buttonContainer}>
-          {currentStep > 0 && (
-            <Pressable style={styles.backButton} onPress={handleBack}>
+          <View style={styles.buttonContainer}>
+            {currentStep > 0 && (
+              <Pressable style={styles.backButton} onPress={handleBack}>
+                <Ionicons
+                  name="arrow-back"
+                  size={20}
+                  color={Colors.text.primary}
+                />
+                <Text style={styles.backButtonText}>Back</Text>
+              </Pressable>
+            )}
+            <Pressable
+              style={[
+                styles.nextButton,
+                !validateStep(currentStep) && styles.nextButtonDisabled,
+              ]}
+              onPress={handleNext}
+              disabled={!validateStep(currentStep)}
+            >
+              <Text style={styles.nextButtonText}>
+                {currentStep === stepsConfig.length - 1 ? "Finish" : "Next"}
+              </Text>
               <Ionicons
-                name="arrow-back"
+                name={
+                  currentStep === stepsConfig.length - 1
+                    ? "checkmark"
+                    : "arrow-forward"
+                }
                 size={20}
                 color={Colors.text.primary}
               />
-              <Text style={styles.backButtonText}>Back</Text>
             </Pressable>
-          )}
-          <Pressable
-            style={[
-              styles.nextButton,
-              !validateStep(currentStep) && styles.nextButtonDisabled,
-            ]}
-            onPress={handleNext}
-            disabled={!validateStep(currentStep)}
-          >
-            <Text style={styles.nextButtonText}>
-              {currentStep === steps.length - 1 ? "Get Started" : "Next"}
-            </Text>
-            <Ionicons
-              name={
-                currentStep === steps.length - 1 ? "checkmark" : "arrow-forward"
-              }
-              size={20}
-              color={Colors.text.primary}
-            />
-          </Pressable>
+          </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -508,15 +609,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 120,
+    paddingBottom: 160,
+    flexGrow: 1,
+    paddingTop: 16,
   },
   progressContainer: {
     paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingTop: 8,
     paddingBottom: 16,
   },
   progressBar: {
@@ -538,7 +644,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 24,
-    paddingBottom: 32,
+    paddingBottom: 24,
   },
   stepTitle: {
     fontSize: 28,
@@ -561,6 +667,8 @@ const styles = StyleSheet.create({
   welcomeContainer: {
     paddingHorizontal: 24,
     alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
   },
   welcomeIcon: {
     marginBottom: 24,
@@ -598,7 +706,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   inputGroup: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   inputLabel: {
     fontSize: 16,
@@ -621,7 +729,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   section: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,

@@ -1,6 +1,6 @@
 import { Redirect } from "expo-router";
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Colors } from "../constants/Colors";
 import { Fonts } from "../constants/Fonts";
 import { useOnboarding } from "../hooks/useOnboarding";
@@ -25,22 +25,6 @@ export default function RootIndex() {
       <View style={styles.container}>
         <Redirect href="/onboarding" />
         {/* Dev reset button - only visible in development */}
-        {__DEV__ && (
-          <Pressable
-            style={styles.devButton}
-            onPress={async () => {
-              console.log("Dev: Resetting onboarding...");
-              try {
-                await resetOnboarding();
-                console.log("Dev: Onboarding reset successfully");
-              } catch (error) {
-                console.error("Dev: Failed to reset onboarding:", error);
-              }
-            }}
-          >
-            <Text style={styles.devButtonText}>Reset Onboarding (Dev)</Text>
-          </Pressable>
-        )}
       </View>
     );
   }
