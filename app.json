@@ -9,7 +9,7 @@
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "org.voluntra.stormshield",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -23,6 +23,10 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
+    },
+    "web": {
+      "output": "server",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",

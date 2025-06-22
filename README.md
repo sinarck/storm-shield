@@ -49,3 +49,76 @@ Join our community of developers creating universal apps.
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
 
+# Storm Shield
+
+A cross-platform volunteer management app built with Expo Router and Supabase.
+
+## API Configuration
+
+This app uses a hybrid approach for API calls to ensure compatibility across all platforms:
+
+### How it works:
+
+1. **Web Development**: Uses local API routes (`/app/api/*`) for development
+2. **Mobile & Production**: Uses direct Supabase client calls
+3. **Static Output**: Web builds use static output for better performance
+
+### Platform-specific behavior:
+
+- **Web (Development)**: API calls go to `http://localhost:8081/api/*`
+- **Web (Production)**: API calls go directly to Supabase
+- **Mobile (All environments)**: API calls go directly to Supabase
+
+### Configuration:
+
+The `services/api.ts` file automatically detects the platform and environment to choose the appropriate API method. No manual configuration needed.
+
+## Development
+
+```bash
+# Install dependencies
+yarn install
+
+# Start development server
+yarn start
+
+# Run on specific platforms
+yarn web    # Web development
+yarn ios    # iOS simulator
+yarn android # Android emulator
+```
+
+## Environment Variables
+
+Create a `.env` file with your Supabase credentials:
+
+```env
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+## Building
+
+```bash
+# Build for web (static)
+yarn build:web
+
+# Build for mobile
+eas build --platform ios
+eas build --platform android
+```
+
+## Troubleshooting
+
+### API Issues:
+
+- **Web not loading**: Ensure you're using `yarn web` for development
+- **Mobile API failures**: Check Supabase credentials and network connectivity
+- **CORS errors**: Verify Supabase RLS policies are configured correctly
+
+### Build Issues:
+
+- **Static output errors**: The app is configured for static output by default
+- **Server output needed**: Change `app.json` web.output to "server" if you need server-side rendering
+
