@@ -1,10 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 
 // Server-side Supabase client (no auth storage needed)
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
   throw new Error("Missing Supabase environment variables");
@@ -39,6 +37,8 @@ export async function GET(request: Request) {
 
     return Response.json(data);
   } catch (error) {
+    console.error("Error fetching user:", error);
+
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

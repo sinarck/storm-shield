@@ -22,14 +22,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "org.voluntra.stormshield"
     },
     "web": {
-      "output": "server",
-      "bundler": "metro"
+      "output": "server"
     },
     "plugins": [
-      "expo-router",
+      [
+        "expo-router"
+      ],
       [
         "expo-splash-screen",
         {
@@ -44,11 +46,12 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {
-        "origin": false
-      },
       "eas": {
         "projectId": "9b58bdb9-c6a6-41f3-9797-9518693d8447"
+      },
+      "router": {
+        "origin": false,
+        "generatedOrigin": "https://storm-shield--3grzhou3p3.expo.app"
       }
     },
     "owner": "voluntra",
@@ -61,4 +64,3 @@
     ]
   }
 }
-

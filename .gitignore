@@ -36,6 +36,10 @@ yarn-error.*
 .env*.local
 .env
 
+# Native code
+ios/
+android/
+
 # typescript
 *.tsbuildinfo
 
