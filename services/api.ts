@@ -1,3 +1,5 @@
+import Constants from "expo-constants";
+import { Platform } from "react-native";
 import { Tables } from "../types/supabase";
 
 // Define types based on Supabase schema
@@ -28,6 +30,36 @@ export type OrganizationWithReviewsAndShifts = Organization & {
   shifts: Shift[]; // Add shifts relationship
 };
 
+// Helper function to get the correct base URL for API calls
+function getBaseUrl(): string {
+  // In development
+  if (__DEV__) {
+    // For mobile development, we need to use the dev server URL
+    if (Platform.OS !== "web") {
+      // Try to get the dev server URL from Expo's manifest
+      const manifestUrl = Constants.expoConfig?.hostUri;
+      if (manifestUrl) {
+        // Extract the host and port from the manifest URL
+        const url = new URL(`http://${manifestUrl}`);
+        return `http://${url.hostname}:${url.port || "8081"}`;
+      }
+      // Fallback to localhost:8081
+      return "http://localhost:8081";
+    }
+    // For web development, relative URLs work fine
+    return "";
+  }
+
+  // In production, use the deployed server URL
+  const generatedOrigin = Constants.expoConfig?.extra?.router?.generatedOrigin;
+  if (generatedOrigin) {
+    return generatedOrigin;
+  }
+
+  // Fallback for production
+  return "";
+}
+
 // Helper function to handle API responses
 async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -44,31 +76,31 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
 export const api = {
   // --- Organizations ---
   getOrganizations: async (): Promise<Organization[]> => {
-    const response = await fetch(`/api/organizations`);
+    const response = await fetch(`${getBaseUrl()}/api/organizations`);
     return handleApiResponse<Organization[]>(response);
   },
 
   getOrganizationById: async (
     id: number
   ): Promise<OrganizationWithReviewsAndShifts | null> => {
-    const response = await fetch(`/api/organizations?id=${id}`);
+    const response = await fetch(`${getBaseUrl()}/api/organizations?id=${id}`);
     return handleApiResponse<OrganizationWithReviewsAndShifts | null>(response);
   },
 
   // --- Shifts ---
   getShifts: async (): Promise<ShiftWithOrganization[]> => {
-    const response = await fetch(`/api/shifts`);
+    const response = await fetch(`${getBaseUrl()}/api/shifts`);
     return handleApiResponse<ShiftWithOrganization[]>(response);
   },
 
   getShiftById: async (id: number): Promise<ShiftWithOrganization | null> => {
-    const response = await fetch(`/api/shifts?id=${id}`);
+    const response = await fetch(`${getBaseUrl()}/api/shifts?id=${id}`);
     return handleApiResponse<ShiftWithOrganization | null>(response);
   },
 
   // --- User Profile ---
   getUserProfile: async (userId: number = 1): Promise<User | null> => {
-    const response = await fetch(`/api/users?id=${userId}`);
+    const response = await fetch(`${getBaseUrl()}/api/users?id=${userId}`);
     return handleApiResponse<User | null>(response);
   },
 
@@ -77,7 +109,7 @@ export const api = {
     shiftId: number,
     userId: number
   ): Promise<ShiftRegistration> => {
-    const response = await fetch(`/api/register`, {
+    const response = await fetch(`${getBaseUrl()}/api/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

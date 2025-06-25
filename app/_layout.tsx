@@ -73,6 +73,10 @@ export default function RootLayout() {
             name="confirmation/[id]"
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+            name="notifications"
+            options={{ headerTitle: "Notifications" }}
+          />
         </Stack>
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       </ThemeProvider>
