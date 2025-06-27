@@ -172,6 +172,16 @@ export default function HomeScreen() {
               <Text style={styles.notificationBadgeText}>3</Text>
             </View>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.profileButton}
+            onPress={() => router.push("/profile")}
+          >
+            <Ionicons
+              name="person-outline"
+              size={24}
+              color={Colors.text.primary}
+            />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -427,6 +437,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
     marginRight: 8,
+  },
+  profileButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.cardBackground,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginLeft: 8,
   },
 });
 

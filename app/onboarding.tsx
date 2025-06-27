@@ -293,7 +293,8 @@ export default function OnboardingScreen() {
     {
       title: "Personal Information",
       subtitle: "Basic details about you",
-      description: "This helps us match you with the right opportunities.",
+      description:
+        "This helps us match you with the right opportunities. All data is stored only on-device.",
       content: {
         type: "form",
         fields: [

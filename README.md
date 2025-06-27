@@ -109,6 +109,28 @@ eas build --platform ios
 eas build --platform android
 ```
 
+## Privacy & Data Management
+
+Storm Shield includes comprehensive privacy features to comply with App Store requirements:
+
+### Account Deletion
+
+- Users can delete their account through the Profile screen
+- Two-step confirmation process to prevent accidental deletion
+- Removes all personal data, shift registrations, and reviews
+- Clears local storage and returns to onboarding
+
+### Data Export
+
+- Users can export their personal data
+- Includes profile information, shift registrations, and reviews
+- Data is formatted for easy access and portability
+
+### Access
+
+- Profile screen accessible via the person icon in the home screen header
+- Settings organized into logical sections: Profile, Settings, and Account
+
 ## Troubleshooting
 
 ### API Issues:

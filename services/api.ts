@@ -1,5 +1,3 @@
-import Constants from "expo-constants";
-import { Platform } from "react-native";
 import { Tables } from "../types/supabase";
 
 // Define types based on Supabase schema
@@ -32,32 +30,7 @@ export type OrganizationWithReviewsAndShifts = Organization & {
 
 // Helper function to get the correct base URL for API calls
 function getBaseUrl(): string {
-  // In development
-  if (__DEV__) {
-    // For mobile development, we need to use the dev server URL
-    if (Platform.OS !== "web") {
-      // Try to get the dev server URL from Expo's manifest
-      const manifestUrl = Constants.expoConfig?.hostUri;
-      if (manifestUrl) {
-        // Extract the host and port from the manifest URL
-        const url = new URL(`http://${manifestUrl}`);
-        return `http://${url.hostname}:${url.port || "8081"}`;
-      }
-      // Fallback to localhost:8081
-      return "http://localhost:8081";
-    }
-    // For web development, relative URLs work fine
-    return "";
-  }
-
-  // In production, use the deployed server URL
-  const generatedOrigin = Constants.expoConfig?.extra?.router?.generatedOrigin;
-  if (generatedOrigin) {
-    return generatedOrigin;
-  }
-
-  // Fallback for production
-  return "";
+  return "https://www.voluntra.org";
 }
 
 // Helper function to handle API responses
@@ -70,7 +43,12 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
       errorData.error || `HTTP error! status: ${response.status}`
     );
   }
-  return response.json();
+  const responseData = await response.json();
+
+  // Extract the data property if it exists, otherwise return the whole response
+  const data =
+    responseData.data !== undefined ? responseData.data : responseData;
+  return data;
 }
 
 export const api = {
@@ -117,6 +95,17 @@ export const api = {
       body: JSON.stringify({ shiftId, userId }),
     });
     return handleApiResponse<ShiftRegistration>(response);
+  },
+
+  // --- Account Management ---
+  deleteUserAccount: async (userId: number): Promise<{ success: boolean }> => {
+    const response = await fetch(`${getBaseUrl()}/api/users/${userId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return handleApiResponse<{ success: boolean }>(response);
   },
 };
 

@@ -29,9 +29,7 @@
       "output": "server"
     },
     "plugins": [
-      [
-        "expo-router"
-      ],
+      ["expo-router"],
       [
         "expo-splash-screen",
         {
@@ -48,10 +46,6 @@
     "extra": {
       "eas": {
         "projectId": "9b58bdb9-c6a6-41f3-9797-9518693d8447"
-      },
-      "router": {
-        "origin": false,
-        "generatedOrigin": "https://storm-shield--fbm384uruk.expo.app"
       }
     },
     "owner": "voluntra",
@@ -64,3 +58,4 @@
     ]
   }
 }
+
