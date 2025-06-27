@@ -61,6 +61,8 @@ export default function ProfileScreen() {
       // Clear local data
       await resetOnboarding();
       // Navigate back to onboarding
+      router.dismissAll();
+
       router.replace("/onboarding");
     } finally {
       setIsDeleting(false);
@@ -124,7 +126,7 @@ export default function ProfileScreen() {
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Recent Activity</Text>
       <View style={styles.activityCard}>
-        <TouchableOpacity style={styles.activityItem}>
+        <View style={styles.activityItem}>
           <View style={styles.activityIcon}>
             <Ionicons
               name="checkmark-circle"
@@ -138,11 +140,11 @@ export default function ProfileScreen() {
             </Text>
             <Text style={styles.activitySubtitle}>2 hours • Yesterday</Text>
           </View>
-        </TouchableOpacity>
+        </View>
 
         <View style={styles.divider} />
 
-        <TouchableOpacity style={styles.activityItem}>
+        <View style={styles.activityItem}>
           <View style={styles.activityIcon}>
             <Ionicons name="calendar" size={20} color={Colors.primary} />
           </View>
@@ -152,11 +154,11 @@ export default function ProfileScreen() {
             </Text>
             <Text style={styles.activitySubtitle}>This Saturday • 3 hours</Text>
           </View>
-        </TouchableOpacity>
+        </View>
 
         <View style={styles.divider} />
 
-        <TouchableOpacity style={styles.activityItem}>
+        <View style={styles.activityItem}>
           <View style={styles.activityIcon}>
             <Ionicons name="star" size={20} color={Colors.rating} />
           </View>
@@ -164,7 +166,7 @@ export default function ProfileScreen() {
             <Text style={styles.activityTitle}>Rated Community Garden</Text>
             <Text style={styles.activitySubtitle}>5 stars • 3 days ago</Text>
           </View>
-        </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -194,18 +196,6 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color={Colors.text.primary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Profile</Text>
-        <View style={styles.headerSpacer} />
-      </View>
-
       {/* Content */}
       {renderProfileSection()}
       {renderStatsSection()}
@@ -224,32 +214,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 24,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.cardBackground,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontFamily: Fonts.bold,
-    color: Colors.text.primary,
-  },
-  headerSpacer: {
-    width: 40,
+    paddingTop: 16,
   },
   section: {
     marginBottom: 24,

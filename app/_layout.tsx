@@ -77,7 +77,13 @@ export default function RootLayout() {
             name="notifications"
             options={{ headerTitle: "Notifications" }}
           />
-          <Stack.Screen name="profile" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="profile"
+            options={{
+              headerTitle: "Profile",
+              headerShown: true,
+            }}
+          />
         </Stack>
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       </ThemeProvider>

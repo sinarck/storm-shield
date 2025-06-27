@@ -473,7 +473,8 @@ export default function OnboardingScreen() {
       try {
         await triggerSuccess();
         await completeOnboarding(formData as UserProfile);
-        router.replace("/(tabs)");
+        // Redirect to root which will handle proper navigation based on onboarding status
+        router.replace("/");
       } catch (error) {
         Alert.alert(
           "Error",
