@@ -176,6 +176,27 @@ export default function ProfileScreen() {
       <Text style={styles.sectionTitle}>Account</Text>
       <View style={styles.settingsCard}>
         <TouchableOpacity
+          style={styles.settingItem}
+          onPress={() => router.push("/credits")}
+        >
+          <View style={styles.settingLeft}>
+            <Ionicons
+              name="information-circle-outline"
+              size={24}
+              color={Colors.text.primary}
+            />
+            <Text style={styles.settingText}>Credits</Text>
+          </View>
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color={Colors.text.secondary}
+          />
+        </TouchableOpacity>
+
+        <View style={styles.divider} />
+
+        <TouchableOpacity
           style={[styles.settingItem, styles.dangerItem]}
           onPress={handleDeleteAccount}
           disabled={isDeleting}
@@ -201,11 +222,6 @@ export default function ProfileScreen() {
       {renderStatsSection()}
       {renderRecentActivitySection()}
       {renderAccountSection()}
-
-      {/* Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Storm Shield v1.0.0</Text>
-      </View>
     </ScrollView>
   );
 }
@@ -392,7 +408,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: "center",
-    paddingVertical: 32,
+    paddingVertical: 0,
     paddingHorizontal: 24,
   },
   footerText: {

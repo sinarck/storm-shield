@@ -84,6 +84,7 @@ export default function RootLayout() {
               headerShown: true,
             }}
           />
+          <Stack.Screen name="credits" options={{ headerTitle: "Credits" }} />
         </Stack>
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       </ThemeProvider>
