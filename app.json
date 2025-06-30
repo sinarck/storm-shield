@@ -11,6 +11,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "org.voluntra.stormshield",
+      "appStoreUrl": "https://apps.apple.com/us/app/storm-shield-3b043e/id6744670006",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSAppTransportSecurity": {

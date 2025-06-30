@@ -1,5 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Linking from "expo-linking";
 import { router } from "expo-router";
+import * as StoreReview from "expo-store-review";
 import React, { useState } from "react";
 import {
   Alert,
@@ -18,6 +20,25 @@ export default function ProfileScreen() {
   const { userProfile } = useStoredUserProfile();
   const { resetOnboarding } = useOnboarding();
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleStoreReview = async () => {
+    try {
+      const isAvailable = await StoreReview.isAvailableAsync();
+      const hasAction = await StoreReview.hasAction();
+
+      if (isAvailable && hasAction) {
+        await StoreReview.requestReview();
+      } else {
+        // Fallback to App Store URL if native review is not available
+        const storeUrl = StoreReview.storeUrl();
+        if (storeUrl) {
+          await Linking.openURL(storeUrl);
+        }
+      }
+    } catch (error) {
+      console.error("Error requesting store review:", error);
+    }
+  };
 
   const handleDeleteAccount = () => {
     Alert.alert(
@@ -175,6 +196,27 @@ export default function ProfileScreen() {
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Account</Text>
       <View style={styles.settingsCard}>
+        <TouchableOpacity
+          style={styles.settingItem}
+          onPress={handleStoreReview}
+        >
+          <View style={styles.settingLeft}>
+            <Ionicons
+              name="star-outline"
+              size={24}
+              color={Colors.text.primary}
+            />
+            <Text style={styles.settingText}>Rate Storm Shield</Text>
+          </View>
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color={Colors.text.secondary}
+          />
+        </TouchableOpacity>
+
+        <View style={styles.divider} />
+
         <TouchableOpacity
           style={styles.settingItem}
           onPress={() => router.push("/credits")}

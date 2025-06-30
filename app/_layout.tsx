@@ -13,6 +13,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { Colors } from "../constants/Colors";
 import { Fonts } from "../constants/Fonts";
+import { useAppLaunch } from "../hooks/useAppLaunch";
 import { useOnboarding } from "../hooks/useOnboarding";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -33,6 +34,9 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts(fonts);
   const { isLoading: isOnboardingLoading } = useOnboarding();
+
+  // Initialize app launch tracking (this will trigger store review on second launch)
+  useAppLaunch();
 
   useEffect(() => {
     if (loaded && !isOnboardingLoading) {
