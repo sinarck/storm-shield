@@ -1,146 +1,225 @@
-# Welcome to your Expo app 👋
-
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
-
-## Get started
-
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-
 # Storm Shield
 
-A cross-platform volunteer management app built with Expo Router and Supabase.
+A cross-platform volunteer management mobile app built with React Native, Expo Router, and Supabase. Storm Shield connects volunteers with organizations to coordinate disaster response and community service efforts.
 
-## API Configuration
+## Features
 
-This app uses a hybrid approach for API calls to ensure compatibility across all platforms:
+- **Volunteer Management**: Browse and register for volunteer shifts
+- **Organization Profiles**: View detailed organization information and available opportunities
+- **Achievement System**: Track volunteer progress and earn achievements
+- **Shift Tracking**: Manage shift registrations and confirmations
+- **Profile Management**: Complete user profiles with skills and availability
+- **Cross-Platform**: Native iOS and Android support with web compatibility
 
-### How it works:
+## Tech Stack
 
-1. **Web Development**: Uses local API routes (`/app/api/*`) for development
-2. **Mobile & Production**: Uses direct Supabase client calls
-3. **Static Output**: Web builds use static output for better performance
+- **Framework**: React Native with Expo SDK 52
+- **Navigation**: Expo Router with file-based routing
+- **Database**: Supabase (PostgreSQL with real-time subscriptions)
+- **State Management**: TanStack React Query for server state
+- **UI/UX**: Custom components with Lucide React Native icons
+- **Forms**: React Hook Form with Zod validation
+- **Styling**: React Native StyleSheet with custom design system
+- **Notifications**: Expo Notifications for push messaging
 
-### Platform-specific behavior:
+## Getting Started
 
-- **Web (Development)**: API calls go to `http://localhost:8081/api/*`
-- **Web (Production)**: API calls go directly to Supabase
-- **Mobile (All environments)**: API calls go directly to Supabase
+### Prerequisites
 
-### Configuration:
+- Node.js 18+ and Yarn
+- iOS: Xcode 14+ and iOS 13+ device/simulator
+- Android: Android Studio and Android 6+ device/emulator
+- [Expo CLI](https://docs.expo.dev/get-started/installation/)
 
-The `services/api.ts` file automatically detects the platform and environment to choose the appropriate API method. No manual configuration needed.
+### Installation
 
-## Development
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd storm-shield
+   ```
+
+2. **Install dependencies**
+   ```bash
+   yarn install
+   ```
+
+3. **Environment setup**
+   Create a `.env` file in the root directory:
+   ```env
+   EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+   EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   ```
+
+4. **Start the development server**
+   ```bash
+   yarn start
+   ```
+
+### Platform-specific Development
 
 ```bash
-# Install dependencies
-yarn install
-
-# Start development server
-yarn start
-
-# Run on specific platforms
-yarn web    # Web development
-yarn ios    # iOS simulator
-yarn android # Android emulator
+# Start for specific platforms
+yarn web      # Web development (localhost:8081)
+yarn ios      # iOS simulator
+yarn android  # Android emulator
 ```
 
-## Environment Variables
+## Project Structure
 
-Create a `.env` file with your Supabase credentials:
-
-```env
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+storm-shield/
+├── app/                    # File-based routing (Expo Router)
+│   ├── (tabs)/            # Tab navigation screens
+│   ├── confirmation/      # Shift confirmation flow
+│   ├── organization/      # Organization detail views
+│   ├── shift/            # Shift detail and management
+│   ├── onboarding.tsx    # User onboarding flow
+│   ├── profile.tsx       # User profile management
+│   └── notifications.tsx # Push notifications
+├── components/            # Reusable UI components
+│   ├── ui/               # Base UI components
+│   ├── ShiftCard.tsx     # Shift display component
+│   ├── OrganizationCard.tsx
+│   └── VolunteerCard.tsx
+├── hooks/                 # Custom React hooks
+│   ├── useApi.ts         # API interaction hook
+│   ├── useOnboarding.ts  # Onboarding state management
+│   └── useUserProfile.ts # User profile management
+├── services/              # External service integrations
+│   └── api.ts            # Supabase API layer
+├── constants/             # App-wide constants
+│   ├── Colors.ts         # Color palette
+│   └── Fonts.ts          # Typography system
+├── types/                 # TypeScript definitions
+│   └── supabase.ts       # Database type definitions
+└── config/                # Configuration files
+    └── achievements.ts    # Achievement definitions
 ```
 
-## Building
+## API Architecture
+
+Storm Shield uses a hybrid API approach for optimal cross-platform compatibility:
+
+### Platform Detection
+- **Web Development**: Uses local API routes for development
+- **Mobile & Production**: Direct Supabase client calls
+- **Automatic Detection**: The app automatically chooses the right method
+
+### Data Flow
+1. **Authentication**: Supabase Auth for user management
+2. **Real-time**: Supabase subscriptions for live updates
+3. **Caching**: TanStack React Query for optimistic updates
+4. **Validation**: Zod schemas for runtime type safety
+
+## Database Schema
+
+Key entities managed by Supabase:
+
+- **Users**: User profiles with skills and contact information
+- **Organizations**: Volunteer organizations and their details  
+- **Shifts**: Volunteer opportunities with time/location details
+- **Registrations**: User-shift relationship tracking
+- **Reviews**: User feedback and ratings system
+- **Achievements**: Gamification and progress tracking
+
+## Building for Production
+
+### Mobile Builds (EAS)
 
 ```bash
-# Build for web (static)
+# Configure EAS
+eas build:configure
+
+# Build for iOS
+eas build --platform ios
+
+# Build for Android  
+eas build --platform android
+
+# Submit to app stores
+eas submit --platform ios
+eas submit --platform android
+```
+
+### Web Build
+
+```bash
+# Static web build
 yarn build:web
 
-# Build for mobile
-eas build --platform ios
-eas build --platform android
+# Output directory: dist/
 ```
 
 ## Privacy & Data Management
 
-Storm Shield includes comprehensive privacy features to comply with App Store requirements:
+Storm Shield includes comprehensive privacy compliance features:
 
-### Account Deletion
+### Account Management
+- **Account Deletion**: Two-step confirmation process
+- **Data Export**: Complete user data export functionality  
+- **Data Cleanup**: Automatic removal of personal data and relationships
 
-- Users can delete their account through the Profile screen
-- Two-step confirmation process to prevent accidental deletion
-- Removes all personal data, shift registrations, and reviews
-- Clears local storage and returns to onboarding
+### Privacy Features
+- **Local Storage**: Secure local data caching
+- **Data Portability**: Export in accessible formats
+- **Consent Management**: Clear privacy controls
 
-### Data Export
+## Development Guidelines
 
-- Users can export their personal data
-- Includes profile information, shift registrations, and reviews
-- Data is formatted for easy access and portability
+### Code Style
+- **TypeScript**: Strict mode enabled with comprehensive typing
+- **Components**: Functional components with hooks
+- **Styling**: Consistent design system with Colors/Fonts constants
+- **Navigation**: File-based routing with typed routes
 
-### Access
+### Testing
 
-- Profile screen accessible via the person icon in the home screen header
-- Settings organized into logical sections: Profile, Settings, and Account
+```bash
+# Run test suite
+yarn test
+
+# Lint code
+yarn lint
+```
+
+### Performance
+- **Bundle Size**: Optimized with selective imports
+- **Images**: Adaptive icons and optimized assets
+- **Caching**: Efficient query caching and persistence
 
 ## Troubleshooting
 
-### API Issues:
+### Common Issues
 
-- **Web not loading**: Ensure you're using `yarn web` for development
-- **Mobile API failures**: Check Supabase credentials and network connectivity
-- **CORS errors**: Verify Supabase RLS policies are configured correctly
+**API Connection Problems:**
+- Verify Supabase credentials in `.env`
+- Check network connectivity for mobile devices
+- Confirm RLS policies are configured correctly
 
-### Build Issues:
+**Build Failures:**
+- Clear Metro cache: `yarn start --clear`
+- Reset Expo cache: `expo r -c`
+- Verify all dependencies are installed
 
-- **Static output errors**: The app is configured for static output by default
-- **Server output needed**: Change `app.json` web.output to "server" if you need server-side rendering
+**Platform-specific Issues:**
+- iOS: Ensure Xcode and simulators are updated
+- Android: Check Android SDK and emulator configuration
+- Web: Use `yarn web` for development server
 
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`) 
+5. Open a Pull Request
+
+## License
+
+This project is part of the Voluntra platform for volunteer coordination and disaster response.
+
+## Support
+
+For questions or support, please reach out through the appropriate channels or create an issue in the repository.
